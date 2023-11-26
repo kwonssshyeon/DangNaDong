@@ -7,6 +7,8 @@
 <title>Insert title here</title>
 </head>
 <body>
-테스트
+<script>
+location.href = 'post.html';
+</script>
 </body>
 </html>
