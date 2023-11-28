@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>여행 동행글 쓰기</title>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script>
+   $(function(){
+	    $("#navbar").load("layout/navbar.html");
+	    $("#footer").load("layout/footer.html");
+	});
+</script>
+</head>
+<body>
+<div id="navbar"></div>
+	<div id="location">한국</div>
+
+	<form action="companionPost.jsp" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+		<br/>
+		제목: <input type="text" name="title">
+		<br/>
+		여행날짜 선택: <input type="date" id="currentDate" name="travel_date" min="2023-01-01" max="2023-12-31" />
+		여행기간: <input type="text" name="travel_period">
+		<br/>
+		모집마감일 : <input type="date" id="currentDate" name="deadline" min="2023-01-01" max="2023-12-31" />
+		<br/>
+		예상 비용: <input type="text" name="expected_cost">
+		<br/>
+		모집인원
+		<br/>
+		인원수 : <input type="number" name="number_of_recruited">
+		성별 : <input type="text" name="gender_condition">
+		나이 : <input type="text" name="age_condition">
+		국적 : <input type="text" name="nationality_condition">
+		<br/>
+		사진첨부: <input type="file" name="image">
+		<br/>
+		글쓰기: <input type="text" name="content_text">
+		
+		
+		
+	
+		<br/>
+		<br/>
+		<input type="reset" value="Reset"/><input type="submit" value="Submit"/>
+	</form>
+
+
+
+
+<div id="footer"></div>
+</body>
+</html>
