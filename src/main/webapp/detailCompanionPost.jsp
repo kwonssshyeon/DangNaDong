@@ -36,7 +36,7 @@
 	
 %>
 <%!
-int post_id=1089;
+int post_id=1411;
 String member_id="Mid1";
 String my_id="Mid2";
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -124,6 +124,19 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	} catch (SQLException e) {
         out.println(e.getMessage());
     }
+	%>
+	<% 
+	String applyNum = "select count(*) from application_info where post_id="+post_id;
+	int aNum=0;
+	stmt = conn.createStatement();
+	try{
+		rs = stmt.executeQuery(applyNum);
+		while (rs.next()) {
+			aNum = rs.getInt(1);
+         }
+	} catch (SQLException e) {
+        out.println(e.getMessage());
+    }
 	
 	
 	%>
@@ -137,12 +150,32 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	<h4>모집조건</h4>
 	<p>인원수: <%= number_of_recruited %></p>
 	<p>성별: <%=gender_condition %>  /  나이: <%=age_condition %>  /  국적: <%=nationality_condition %></p>
-	<h1><%= content_text %></h1>
+	<h3><%= content_text %></h3>
+	<h1>신청현황</h1>
+	<%
+	//신청현황정보 가져오기
+		String applySql = "select nickname, profile_image from member natural join application_info where request_state='수락' and post_id="+post_id;
+		String aNickname="";
+		String aProfile_image="";
+		stmt = conn.createStatement();
+		try{
+			rs = stmt.executeQuery(applySql);
+			while (rs.next()) {
+				aNickname = rs.getString(1);
+				aProfile_image = rs.getString(2);
+				out.print("<img src="+aProfile_image+">");
+				out.print("<h4>"+aNickname+"</h4>");
+	         }
+			out.println("<h2>"+aNum+ " / " +number_of_recruited+"</h2>");
+		} catch (SQLException e) {
+	        out.println(e.getMessage());
+	    }
+	%>
 	
 	<button onclick="location.href='apply.html'">신청하기</button >
 	<button onclick="location.href='chat.html'">채팅하기</button >
-
-
+	
+	
 
 
 <div id="footer"></div>
