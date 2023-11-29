@@ -26,11 +26,11 @@
 		</select>
 	</form>
 	
-	<form>
-		<select name="write">
-			<option value="selection">글쓰기</option>
-			<option value="cpn_post">동행찾기 글쓰기</option>
-			<option value="itr_post">일정소개 글쓰기</option>
+	<form action="" name="post">
+		<select name="write" onchange="location=document.post.write.value">
+			<option>글쓰기</option>
+			<option value="companionPost.html">동행찾기 글쓰기</option>
+			<option value="introducePost.html">일정소개 글쓰기</option>
 		</select>
 	</form>
 	
