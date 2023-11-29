@@ -55,7 +55,7 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 <h4>저장되었습니다.</h4>
 <%
 	conn.setAutoCommit(false);
-	String directory = application.getRealPath("/image/");
+	String directory = "C:/SourceCode/2023_Database/DangNaDong/src/main/webapp/image/";
 	int maxSize = 1024*1024*100;
 	String encoding = "UTF-8";
 	
@@ -95,9 +95,8 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	} catch (SQLException e) {
         out.println(e.getMessage());
     }
-	String image_name = multipartRequest.getOriginalFileName("image");
-	String image_url = multipartRequest.getFilesystemName("image");
-
+	String image_url = multipartRequest.getOriginalFileName("image");
+	String image_name = multipartRequest.getFilesystemName("image");
 
 
 	String image_query = "INSERT INTO cpn_image " +
@@ -106,8 +105,9 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	try{
 		pstmt = conn.prepareStatement(image_query);
 		pstmt.setInt(1, post_id);
-		pstmt.setString(2, image_url);
-		pstmt.setString(3, image_name.substring(8));
+		pstmt.setString(2, "./image/"+image_url);
+		//TODO: 문자열 크기 제한
+		pstmt.setString(3, image_name);
 		pstmt.executeUpdate();
 		
 		conn.commit();
