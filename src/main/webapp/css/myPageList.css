@@ -1,0 +1,26 @@
+/* myPageStyle.css */
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.column {
+    margin-right: 10px;
+    border: 1px solid #ccc; /* 회색 얇은 선 추가 */
+    padding: 10px; /* 내부 여백 추가 */
+    margin-bottom: 15px; /* 아래쪽 마진 추가 */
+}
+
+.column div {
+    font-size: 16px;
+    color: #333;
+
+}
+
