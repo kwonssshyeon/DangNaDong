@@ -4,6 +4,7 @@
 <%@ page language="java" import="java.time.format.DateTimeFormatter" %>
 <%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
 <%@ page import="com.oreilly.servlet.MultipartRequest" %>
+<%@ page import="com.reply" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,9 +15,20 @@
    $(function(){
 	    $("#navbar").load("layout/navbar.html");
 	    $("#footer").load("layout/footer.html");
-	    $("#reply").load("reply.jsp");
 	    $("#replyForm").load("reply.html");
 	});
+</script>
+<script type="text/javascript"> 
+   history.replaceState({}, null, location.pathname); 
+</script> 
+
+<script type="text/javascript">		
+	var reply = function(member_id,post_id) {			
+		location.href = "oneToOneChat.jsp?member="+member_id+"&post="+post_id;
+	};
+	var insertR = function(){
+		$("#reply").load(window.location.href+"#reply")
+	
 </script>
 </head>
 <body>
@@ -38,7 +50,7 @@
 	
 %>
 <%!
-int post_id=2006;
+int post_id=1664;
 int reply_id;
 String member_id="Mid1";
 String my_id="Mid2";
@@ -134,13 +146,12 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	<h1><%= content_text %></h1>
 	
 	
-	<div id="reply"></div>
-	<div id="replyForm"></div>
+
 	
 	<%
 	//댓글정보 가져오기
 	out.println("<h1>댓글</h1>");
-	String replySql = "select nickname, profile_image, content, creation_time from member natural join reply where post_id="+1193;
+	String replySql = "select nickname, profile_image, content, creation_time from member natural join reply where post_id="+post_id;
 	String rNickname="";
 	String rProfile_image="";
 	String rContent="";
@@ -161,33 +172,22 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	} catch (SQLException e) {
         out.println(e.getMessage());
     }
-	
-	
-	//댓글 입력하기 ?!?!?!
 	%>
 	
-	
-	<%!
-	public void insertR(Connection conn,String content){
-		String insertReply = "INSERT INTO REPLY (reply_id, Member_id, Post_id, Content, Creation_time) VALUES (?, ?, ?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'))";
-		try{
-			PreparedStatement pstmt = conn.prepareStatement(insertReply);
-			pstmt.setInt(1, reply_id);
-			pstmt.setString(2, member_id);
-			pstmt.setInt(3, post_id);
-			pstmt.setString(4, content);
-			pstmt.setString(5, creationTime);
 
-			pstmt.executeUpdate();
-			pstmt.close();
-		} catch (SQLException e) {
+	
+	<form name="insert_reply">
+		<input type = "text" name="content" id="content">
+		<input type="submit" onClick="		
+		<%
+			String content = request.getParameter("content");
+			reply REPLY = new reply();
+			REPLY.insertReply(content,"Mid101",1664);
 			
-		}
-	}
+		%>; insertR();">
+	</form>
+
 	
-	
-	%>
-</div>
 
 
 

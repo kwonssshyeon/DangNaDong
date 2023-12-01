@@ -4,18 +4,39 @@
 <%@ page language="java" import="java.time.format.DateTimeFormatter" %>
 <%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
 <%@ page import="com.oreilly.servlet.MultipartRequest" %>
+<%@ page import="com.apply" %>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>여행동행글 상세보기</title>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+<script src="
+https://cdn.jsdelivr.net/npm/bootstrap-modal-js@2.0.1/dist/bootstrap-modal-js.min.js
+"></script>
+<link href="
+https://cdn.jsdelivr.net/npm/bootstrap-modal-js@2.0.1/demoFiles/bootstrap.min.css
+" rel="stylesheet">
 <script>
    $(function(){
 	    $("#navbar").load("layout/navbar.html");
 	    $("#footer").load("layout/footer.html");
 	});
 </script>
+<script type="text/javascript">		
+	var apply = function(member_id,post_id) {			
+		location.href = "apply.jsp?member="+member_id+"&post="+post_id;
+	};	
+	var chatting = function(member_id,post_id) {			
+		//location.href = "oneToOneChat.jsp?member="+member_id+"&post="+post_id;
+		location.href = "detailCompanionPost.jsp";
+	};
+</script>
+
+
+
 </head>
 <body>
 <div id="navbar"></div>
@@ -37,10 +58,35 @@
 %>
 <%!
 int post_id=1411;
-String member_id="Mid1";
-String my_id="Mid2";
+String my_id="Mid1";
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 %>
+
+<script>
+$(document).ready(function() {
+    // Click event for the button
+    var member_id = '<%= my_id %>';
+    var post_id = <%= post_id %>;
+    $("#applyButton").on("click", function() {
+        // AJAX request to call the Java function
+        $.ajax({
+            type: "POST",
+            url: "applicate", // Replace with the actual servlet URL
+            data:{"member_id":member_id,
+            		"post_id":post_id},
+            success: function(response) {
+                // Handle the response from the server (if needed)
+                console.log("Java function executed successfully:", response);
+                alert(response);
+            },
+            error: function(error) {
+                console.log("Error:", error);
+                alert(error);
+            }
+        });
+    });
+});
+</script>
 <div id="content">
 <%
 	//post 정보 가져오기
@@ -60,7 +106,7 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	String nationality_condition="";
 	
 	
-		
+	//동행글 정보 가져오기
 	String selectSql = "select * from TRAVEL_COMPANION_POST where post_id="+ post_id;
 	Statement stmt = conn.createStatement();
 	try{
@@ -124,9 +170,27 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	} catch (SQLException e) {
         out.println(e.getMessage());
     }
+	
+	//사용자 닉네임 가져오기
+	String userSql = "select nickname,profile_image from member where member_id='"+member_id+"'";
+	String nickname="";
+	String profileImg="";
+	stmt = conn.createStatement();
+	try{
+		rs = stmt.executeQuery(userSql);
+		while (rs.next()) {
+			nickname = rs.getString(1);
+			profileImg = rs.getString(2);
+         }
+	} catch (SQLException e) {
+        out.println(e.getMessage());
+    }
 	%>
-	<% 
-	String applyNum = "select count(*) from application_info where post_id="+post_id;
+	
+	
+	<%
+	//신청현황 정보 가져오기
+	String applyNum = "select count(*) from application_info where request_state='수락' and post_id="+post_id;
 	int aNum=0;
 	stmt = conn.createStatement();
 	try{
@@ -142,8 +206,10 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	%>
 	<h1><%= nation %></h1>
 	<h1><%= title %></h1>
-	<h1><%= member_id %></h1>
+	<img src="<%= profileImg%>">
+	<h1><%= nickname %></h1>
 	<p><%= creation_time %>        좋아요 수: <%=like %></p>
+	<h4>상태(<%=state %>)</h4>
 	<img src="<%=img%>">
 	<p>여행날짜: <%= travel_date %>  /  여행기간:<%= travel_period %></p>	
 	<p>비용:<%= cost %></p>
@@ -152,6 +218,7 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	<p>성별: <%=gender_condition %>  /  나이: <%=age_condition %>  /  국적: <%=nationality_condition %></p>
 	<h3><%= content_text %></h3>
 	<h1>신청현황</h1>
+	
 	<%
 	//신청현황정보 가져오기
 		String applySql = "select nickname, profile_image from member natural join application_info where request_state='수락' and post_id="+post_id;
@@ -171,11 +238,36 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	        out.println(e.getMessage());
 	    }
 	%>
+		
+	<input type="button" value="신청하기" onClick="apply('<%=my_id %>',<%=post_id %>)" />
+	<input type="button" value="채팅하기" onClick="chatting('<%=my_id %>',<%=post_id %>)" />
 	
-	<button onclick="location.href='apply.html'">신청하기</button >
-	<button onclick="location.href='chat.html'">채팅하기</button >
+	<!-- Button trigger modal -->
+	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+	  신청하기
+	</button>
 	
+	<!-- Modal -->
+	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h1 class="modal-title fs-5" id="exampleModalLabel">동행 신청</h1>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	        <%=nickname %>님의 '<%=title %>'에 동행을 신청하시겠습니까?
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+	        <button type="button" id="applyButton" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
 	
+
 
 
 <div id="footer"></div>
