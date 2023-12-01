@@ -9,7 +9,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>DND:Login</title>
+<link rel="stylesheet" href="./css/signup.css">
+<title>DND:Sign-up Successful</title>
 </head>
 <body>
 <% 
@@ -45,12 +46,17 @@
 	
 	String sql = "insert into member values('"+member_id+"','"+gender+"','"+brith+"','"+selfitr+"','"+email+"','"+nickname+"','"+password+"','"+image_url+"')";
 	pstmt = conn.prepareStatement(sql);
-	out.println(sql);
+	//out.println(sql);
 	rs = pstmt.executeQuery();
 	
+	//response.sendRedirect("main.jsp");
+	
 %>
-<h2>Sign-up Successful! Welcome!</h2><br>
-<h2>♣ DangNaDong 에서 여행을 함께해요 ♣</h2>
+
+<div class="welcome">
+	<h2>♣ DangNaDong 에서 여행을 함께해요 ♣</h2>
+	<a href="login.html">Go to Login</a>
+</div>
 
 </body>
 </html>
