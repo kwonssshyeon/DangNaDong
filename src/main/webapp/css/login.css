@@ -39,7 +39,7 @@ body {
 }
 
 .loginBtn {
-  text-align: center; /* 로그인 버튼을 가운데 정렬 */
+  text-align: center;
 }
 
 .loginBtn input {
@@ -47,6 +47,6 @@ body {
   color: #ffffff;
   padding: 10px 20px;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
-  /* 다른 스타일 속성도 추가할 수 있습니다. */
 }

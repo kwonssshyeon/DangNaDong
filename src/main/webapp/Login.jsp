@@ -1,11 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page language="java" import="java.text.*,java.sql.*" %>
+<%@ page import="java.io.*,java.util.*" %>
+<%@ page import="javax.servlet.*,javax.servlet.http.*" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>DND:Login Success</title>
 
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script>
@@ -43,11 +45,18 @@
     rs = pstmt.executeQuery();
     
     if (rs.next()) {
-        out.println("<p>Login successful! Welcome, " + member_id + "!</p>");
+        HttpSession s = request.getSession();
+        s.setAttribute("member_id", member_id);
+        //메인으로 바로 이동
+        response.sendRedirect("main.jsp");
     } else {
         out.println("<p>Login failed. Please check your ID and password.</p>");
     }	
 %>
+<h2>아직 DangNaDong 회원이 아니신가요?</h2>
+<a href="signup.html">회원가입하기</a>
+
+
 <div id="footer"></div>
 </body>
 </html>
