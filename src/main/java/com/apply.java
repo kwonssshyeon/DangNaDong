@@ -51,7 +51,8 @@ public class apply extends HttpServlet{
 		  Scanner scanner = new Scanner(System.in);
 		  String result;
 		
-		  if(member_id==null || member_id.isEmpty())return "Try to use after login";
+		  if(member_id==null || member_id.isEmpty())
+			  return "Try to use after login";
 		  try {
 			// Load a JDBC driver for Oracle DBMS
 			Class.forName("oracle.jdbc.driver.OracleDriver");

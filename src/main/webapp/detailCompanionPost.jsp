@@ -13,12 +13,8 @@
 <title>여행동행글 상세보기</title>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-<script src="
-https://cdn.jsdelivr.net/npm/bootstrap-modal-js@2.0.1/dist/bootstrap-modal-js.min.js
-"></script>
-<link href="
-https://cdn.jsdelivr.net/npm/bootstrap-modal-js@2.0.1/demoFiles/bootstrap.min.css
-" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-modal-js@2.0.1/dist/bootstrap-modal-js.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-modal-js@2.0.1/demoFiles/bootstrap.min.css" rel="stylesheet">
 <script>
    $(function(){
 	    $("#navbar").load("layout/navbar.html");
@@ -238,8 +234,6 @@ $(document).ready(function() {
 	        out.println(e.getMessage());
 	    }
 	%>
-		
-	<input type="button" value="신청하기" onClick="apply('<%=my_id %>',<%=post_id %>)" />
 	<input type="button" value="채팅하기" onClick="chatting('<%=my_id %>',<%=post_id %>)" />
 	
 	<!-- Button trigger modal -->

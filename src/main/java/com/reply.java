@@ -6,13 +6,21 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.io.IOException;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class reply {
-	public static final String URL = "jdbc:oracle:thin:@localhost:1521:orcl";
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/submitReply")
+public class reply extends HttpServlet{
+	   public static final String URL = "jdbc:oracle:thin:@localhost:1521:orcl";
 	   public static final String USER_UNIVERSITY = "university";
 	   public static final String USER_PASSWD = "comp322";
 	   public static final List<String> TABLES_NAME = Arrays.asList("APPLICATION_INFO", "CPN_CONTAIN", "CPN_IMAGE",
@@ -24,13 +32,30 @@ public class reply {
 	   public static int post_id = 1001;
 	   private int reply_id = 5000;
 	   String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	   
+	   public void doPost(HttpServletRequest request, HttpServletResponse response)
+	            throws ServletException, IOException {
+		   
+		   String member_id = request.getParameter("member_id");
+		   int post_id = Integer.parseInt(request.getParameter("post_id"));
+		   String content = request.getParameter("content");
+	        // Your Java function logic goes here
+		   System.out.print(member_id+post_id+content);
+		   
+		   String result = insertReply(content,member_id,post_id);
 
-	   public void insertReply(String content,String member_id,int post_id) {
+	        // Send a response (if needed)
+	       response.getWriter().write(result);
+	   }
+
+	   public String insertReply(String content,String member_id,int post_id) {
 	      Connection conn = null; // Connection object
 	      Statement stmt = null;    // Statement object
 	      Scanner scanner = new Scanner(System.in);
+	      
+	      String result="";
 
-	      if(content==null || content.isEmpty())return;
+	      if(content==null || content.isEmpty())return "You can summit comment after writing";
 	      try {
 	         // Load a JDBC driver for Oracle DBMS
 	         Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -70,9 +95,9 @@ public class reply {
 			e.printStackTrace();
 		}
 
-	      String insertReply = "INSERT INTO REPLY (reply_id, Member_id, Post_id, Content, Creation_time) VALUES (?, ?, ?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'))";
+	    String insertReply = "INSERT INTO REPLY (reply_id, Member_id, Post_id, Content, Creation_time) VALUES (?, ?, ?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'))";
 	      
-	      try{
+	    try{
 			PreparedStatement pstmt = conn.prepareStatement(insertReply);
 			pstmt.setInt(1, reply_id);
 			pstmt.setString(2, member_id);
@@ -82,17 +107,21 @@ public class reply {
 			
 			pstmt.executeUpdate();
 			System.out.print(pstmt);
+			result="successfully submmited";
 			pstmt.close();
 			} catch (SQLException e) {
 				System.out.print(e.getMessage());
+				result="failed to submmit";
 			}
-	      try {
+	    try {
 			conn.commit();
-		} catch (SQLException e) {
+		}catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	      
+	    
+	    return result;
+	     
 	      
 
 	}

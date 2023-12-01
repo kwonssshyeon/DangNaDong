@@ -11,27 +11,20 @@
 <meta charset="UTF-8">
 <title>일정소개글 상세보기</title>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
 <script>
    $(function(){
 	    $("#navbar").load("layout/navbar.html");
 	    $("#footer").load("layout/footer.html");
-	    $("#replyForm").load("reply.html");
 	});
 </script>
-<script type="text/javascript"> 
-   history.replaceState({}, null, location.pathname); 
-</script> 
 
-<script type="text/javascript">		
-	var reply = function(member_id,post_id) {			
-		location.href = "oneToOneChat.jsp?member="+member_id+"&post="+post_id;
-	};
-	var insertR = function(){
-		$("#reply").load(window.location.href+"#reply")
-	
-</script>
 </head>
 <body>
+
+
 <div id="navbar"></div>
 <% 
 	String serverIP = "localhost";
@@ -46,9 +39,8 @@
 	ResultSet rs;
 	Class.forName("oracle.jdbc.driver.OracleDriver");
 	conn = DriverManager.getConnection(url,user,pass);
-	
-	
 %>
+
 <%!
 int post_id=1664;
 int reply_id;
@@ -56,6 +48,41 @@ String member_id="Mid1";
 String my_id="Mid2";
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 %>
+<script type="text/javascript">
+var content
+	function func() {
+	content = document.getElementById("replyText").value;
+	}
+
+$(document).ready(function() {
+    // Click event for the button
+    var member_id = '<%= my_id %>';
+    var post_id = <%= post_id %>;
+    //var content = document.getElementById('replyText').value;
+    
+    $("#replyBtn").on("click", function() {
+        // AJAX request to call the Java function
+        $.ajax({
+            type: "POST",
+            url: "submitReply", // Replace with the actual servlet URL
+            data:{"member_id":member_id,
+            		"post_id":post_id,
+            		"content":content},
+            		
+            success: function(response) {
+                // Handle the response from the server (if needed)
+                console.log("Java function executed successfully:", response);
+                alert(response);
+                location.reload();
+            },
+            error: function(error) {
+                console.log("Error:", error);
+                alert(error);
+            }
+        });
+    });
+});
+</script>
 <%
 	String max_query="SELECT MAX(reply_id) FROM REPLY";
 	Statement stmt = conn.createStatement();
@@ -63,11 +90,9 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	if(max_rs.next())
 		reply_id = max_rs.getInt(1);
 	max_rs.close();
-	//stmt.close();
 %>
-<div id="content">
+
 <%
-	//post 정보 가져오기
 	String member_id="";
 	String creation_time="";
 	String title="";
@@ -175,17 +200,14 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 	%>
 	
 
+
 	
-	<form name="insert_reply">
-		<input type = "text" name="content" id="content">
-		<input type="submit" onClick="		
-		<%
-			String content = request.getParameter("content");
-			reply REPLY = new reply();
-			REPLY.insertReply(content,"Mid101",1664);
-			
-		%>; insertR();">
-	</form>
+
+	
+	<div class="input-group mb-3">
+  	<input type="text" id="replyText" class="form-control" placeholder="댓글을 입력하세요" onchange='func()'>
+  	<button type="button" id="replyBtn" class="btn btn-primary">등록</button>
+	</div>
 
 	
 
