@@ -1,14 +1,23 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page language="java" import="java.text.*,java.sql.*" %>
-    
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="EUC-KR">
-<title>DND:Login</title>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script>
+   $(function(){
+	    $("#navbar").load("layout/navbar.html");
+	    $("#footer").load("layout/footer.html");
+	});
+</script>
+
 </head>
 <body>
+<div id="navbar"></div>
 <% 
 
 	String member_id = request.getParameter("member_id");
@@ -39,16 +48,6 @@
         out.println("<p>Login failed. Please check your ID and password.</p>");
     }	
 %>
-
-
-<h2>Login Information</h2>
-	<ul>
-		<li><p>ID : 
-			<b><%= request.getParameter("member_id")%></b>
-		</p></li>
-		<li><p>PW : 
-			<b><%= request.getParameter("user_password") %></b>
-		</p></li>
-	</ul>
+<div id="footer"></div>
 </body>
 </html>
