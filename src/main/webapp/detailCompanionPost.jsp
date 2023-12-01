@@ -247,9 +247,9 @@ $(document).ready(function() {
 					  <li class="list-group-item">여행날짜: <%= travel_date %>  /  여행기간:<%= travel_period %></li>
 					  <li class="list-group-item">모집마감 날짜 : <%=deadline %></li>
 					  <li class="list-group-item">비용:<%= cost %></li>
-					<ul class="list-group">
-					<br/>
 					</ul>
+					<br/>
+					<ul class="list-group">
 					  <li class="list-group-item">모집조건</li>
 					  <li class="list-group-item">인원수: <%= number_of_recruited %></li>
 					  <li class="list-group-item">성별: <%=gender_condition %>  /  나이: <%=age_condition %>  /  국적: <%=nationality_condition %></li>
