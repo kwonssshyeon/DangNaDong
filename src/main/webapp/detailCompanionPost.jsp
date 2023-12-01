@@ -15,6 +15,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-modal-js@2.0.1/dist/bootstrap-modal-js.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-modal-js@2.0.1/demoFiles/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="./css/detailCompanion.css" />
 <script>
    $(function(){
 	    $("#navbar").load("layout/navbar.html");
@@ -26,8 +27,8 @@
 		location.href = "apply.jsp?member="+member_id+"&post="+post_id;
 	};	
 	var chatting = function(member_id,post_id) {			
-		//location.href = "oneToOneChat.jsp?member="+member_id+"&post="+post_id;
-		location.href = "detailCompanionPost.jsp";
+		location.href = "oneToOneChat.jsp?member="+member_id+"&post="+post_id;
+		//location.href = "detailCompanionPost.jsp";
 	};
 </script>
 
@@ -53,30 +54,47 @@
 	
 %>
 <%!
-int post_id=1411;
+int post_id=295;
 String my_id="Mid1";
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 %>
 
 <script>
 $(document).ready(function() {
-    // Click event for the button
     var member_id = '<%= my_id %>';
     var post_id = <%= post_id %>;
+    
     $("#applyButton").on("click", function() {
-        // AJAX request to call the Java function
         $.ajax({
             type: "POST",
-            url: "applicate", // Replace with the actual servlet URL
+            url: "applicate",
             data:{"member_id":member_id,
             		"post_id":post_id},
             success: function(response) {
-                // Handle the response from the server (if needed)
-                console.log("Java function executed successfully:", response);
                 alert(response);
+                location.reload();
             },
             error: function(error) {
-                console.log("Error:", error);
+                alert(error);
+            }
+        });
+    });
+});
+$(document).ready(function() {
+    var member_id = '<%= my_id %>';
+    var post_id = <%= post_id %>;
+    
+    $("#likeButton").on("click", function() {
+        $.ajax({
+            type: "POST",
+            url: "like",
+            data:{"member_id":member_id,
+            		"post_id":post_id},
+            success: function(response) {
+                alert(response);
+                location.reload();
+            },
+            error: function(error) {
                 alert(error);
             }
         });
@@ -197,49 +215,102 @@ $(document).ready(function() {
 	} catch (SQLException e) {
         out.println(e.getMessage());
     }
-	
-	
 	%>
-	<h1><%= nation %></h1>
-	<h1><%= title %></h1>
-	<img src="<%= profileImg%>">
-	<h1><%= nickname %></h1>
-	<p><%= creation_time %>        좋아요 수: <%=like %></p>
-	<h4>상태(<%=state %>)</h4>
-	<img src="<%=img%>">
-	<p>여행날짜: <%= travel_date %>  /  여행기간:<%= travel_period %></p>	
-	<p>비용:<%= cost %></p>
-	<h4>모집조건</h4>
-	<p>인원수: <%= number_of_recruited %></p>
-	<p>성별: <%=gender_condition %>  /  나이: <%=age_condition %>  /  국적: <%=nationality_condition %></p>
-	<h3><%= content_text %></h3>
-	<h1>신청현황</h1>
 	
-	<%
-	//신청현황정보 가져오기
-		String applySql = "select nickname, profile_image from member natural join application_info where request_state='수락' and post_id="+post_id;
-		String aNickname="";
-		String aProfile_image="";
-		stmt = conn.createStatement();
-		try{
-			rs = stmt.executeQuery(applySql);
-			while (rs.next()) {
-				aNickname = rs.getString(1);
-				aProfile_image = rs.getString(2);
-				out.print("<img src="+aProfile_image+">");
-				out.print("<h4>"+aNickname+"</h4>");
-	         }
-			out.println("<h2>"+aNum+ " / " +number_of_recruited+"</h2>");
-		} catch (SQLException e) {
-	        out.println(e.getMessage());
-	    }
-	%>
-	<input type="button" value="채팅하기" onClick="chatting('<%=my_id %>',<%=post_id %>)" />
+	<article>
+        <!-- Post header-->
+        <div class="mb-4">
+            <!-- Post title-->
+            <a class="badge bg-secondary text-decoration-none link-light" ><%= nation %></a>
+            <h1 class="fw-bolder mb-1"><%= title %></h1>
+            <!-- Post meta content-->
+            <div class="meta_info">
+            <div class=info><img src="<%= profileImg%>" width="50" width="50"/><%=nickname %></div>
+            <div class=info>좋아요 수: <%=like %>
+            	<button type="button" id="likeButton" class="btn btn-primary">좋아요</button><br/>
+            <h4>상태(<%=state %>)</h4></div>
+            </div>
+            <div class="text-muted fst-italic mb-2">Posted on <%= creation_time %></div>
+            <!-- Post categories-->
+        </div>
+        <!-- Preview image figure-->
+        <figure class="mb-4"><img class="img-fluid rounded" src="<%=img%>"/></figure>
+    </article>
 	
-	<!-- Button trigger modal -->
-	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-	  신청하기
-	</button>
+	<div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                	<!--  -->
+                	<section class="mb-5">
+                	<ul class="list-group">
+					  <li class="list-group-item">여행날짜: <%= travel_date %>  /  여행기간:<%= travel_period %></li>
+					  <li class="list-group-item">모집마감 날짜 : <%=deadline %></li>
+					  <li class="list-group-item">비용:<%= cost %></li>
+					<ul class="list-group">
+					<br/>
+					</ul>
+					  <li class="list-group-item">모집조건</li>
+					  <li class="list-group-item">인원수: <%= number_of_recruited %></li>
+					  <li class="list-group-item">성별: <%=gender_condition %>  /  나이: <%=age_condition %>  /  국적: <%=nationality_condition %></li>
+					</ul>
+                	</section>
+                
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5 mb-4"><%= content_text %></p>
+                    </section>
+                </article>
+               
+            </div>
+            <!-- Side widgets-->
+            <div class="col-lg-4">
+	            <div class="card mb-4">
+	            <div class="d-grid gap-2">
+	            	<input type="button" class="btn btn-primary" value="채팅하기" onClick="chatting('<%=my_id %>',<%=post_id %>)" />
+	            </div>
+	            </div>
+	            <div class="card mb-4">
+	            	<div class="d-grid gap-2">
+		            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+					  신청하기
+					</button>
+					</div>
+	            </div>
+                
+                <!-- Side widget-->
+                <div class="card mb-4">
+                    <div class="card-header">신청 현황</div>
+                    <div class="card-body"><h2><%= aNum%> / <%= number_of_recruited%></h2></div>
+                    <div class="card-body">함께하는 사람<br/>
+                    <div class='companion'>
+                    <%
+					//신청현황정보 가져오기
+						String applySql = "select nickname, profile_image from member natural join application_info where request_state='수락' and post_id="+post_id;
+						String aNickname="";
+						String aProfile_image="";
+						stmt = conn.createStatement();
+						try{
+							rs = stmt.executeQuery(applySql);
+							while (rs.next()) {
+								aNickname = rs.getString(1);
+								aProfile_image = rs.getString(2);
+								out.print("<div class='person'><img src="+aProfile_image+" width=50 height=50><br/>"+aNickname+"</div>");
+							
+					         }
+						} catch (SQLException e) {
+					        out.println(e.getMessage());
+					    }
+					%>
+					</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+
 	
 	<!-- Modal -->
 	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
