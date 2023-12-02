@@ -92,7 +92,6 @@ public class apply extends HttpServlet{
 			} catch (SQLException e) {
 				result = "You've already applied.";
 				System.out.println(e.getMessage());
-				System.out.print("이미 신청했습니다.");
 			}
 		  try {
 			conn.commit();

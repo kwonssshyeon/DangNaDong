@@ -22,16 +22,7 @@
 	    $("#footer").load("layout/footer.html");
 	});
 </script>
-<script type="text/javascript">		
-	var apply = function(member_id,post_id) {			
-		location.href = "apply.jsp?member="+member_id+"&post="+post_id;
-	};	
-	var chatting = function(member_id,post_id) {			
-		location.href = "oneToOneChat.jsp?member="+member_id+"&post="+post_id;
-		//location.href = "detailCompanionPost.jsp";
-		//location.href = "oneToOneChat.jsp"
-	};
-</script>
+
 
 
 
@@ -56,9 +47,21 @@
 %>
 <%!
 int post_id=295;
-String my_id="Mid1";
+String my_id="Mid247";
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+boolean isOwner=false;
 %>
+
+<script type="text/javascript">	
+	var member_id = '<%= my_id %>';
+	var post_id = <%= post_id %>;
+	var apply = function(member_id,post_id) {			
+		location.href = "apply.jsp?member="+member_id+"&post="+post_id;
+	};	
+	var chatting = function() {			
+		location.href = "oneToOneChat.jsp?member="+member_id+"&post="+post_id;
+	};
+</script>
 
 <script>
 $(document).ready(function() {
@@ -200,6 +203,8 @@ $(document).ready(function() {
 	} catch (SQLException e) {
         out.println(e.getMessage());
     }
+	
+	if(my_id.equals(member_id))isOwner=true;
 	%>
 	
 	
@@ -268,14 +273,26 @@ $(document).ready(function() {
             <div class="col-lg-4">
 	            <div class="card mb-4">
 	            <div class="d-grid gap-2">
-	            	<input type="button" class="btn btn-primary" value="채팅하기" onClick="chatting('<%=my_id %>',<%=post_id %>)" />
+	            <!-- 본인 글에는 신청/채팅할 수 없도록 -->
+	            <% if (isOwner==false){
+	            	out.print("<input type='button' class='btn btn-primary' value='채팅하기' onClick='chatting()' />");
+	            }
+	            else{
+	            	out.print("<input type='button' class='btn btn-primary' disabled value='채팅하기' onClick='chatting('"+my_id+"',"+post_id+")'/>");
+	            }
+	            %>
+	            	
 	            </div>
 	            </div>
 	            <div class="card mb-4">
 	            	<div class="d-grid gap-2">
-		            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-					  신청하기
-					</button>
+	            	<% if (isOwner==false){
+		            	out.print("<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#exampleModal'>신청하기</button>");
+		            }
+		            else{
+		            	out.print("<button type='button' class='btn btn-primary' disabled data-bs-toggle='modal' data-bs-target='#exampleModal'>신청하기</button>");
+		            }
+		            %>
 					</div>
 	            </div>
                 

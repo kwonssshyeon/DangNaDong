@@ -241,7 +241,7 @@ $(document).ready(function() {
                 <%
 				//댓글정보 가져오기
 				out.println("<h3>댓글</h3>");
-				String replySql = "select nickname, profile_image, content, creation_time from member natural join reply where post_id="+post_id;
+				String replySql = "select nickname, profile_image, content, creation_time from member natural join reply where post_id="+post_id+"order by creation_time asc";
 				String rNickname="";
 				String rProfile_image="";
 				String rContent="";
