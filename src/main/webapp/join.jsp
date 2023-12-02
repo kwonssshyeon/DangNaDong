@@ -55,7 +55,7 @@
 			<h2>! 로그인 실패 !</h2>
 			<h2>아이디와 비밀번호를 확인하세요.</h2>
 			<h2>아직 DangNaDong 회원이 아니신가요?</h2>
-			<a href="signup.html">회원가입하기</a>
+			<a href="join.html">회원가입하기</a>
 		</div>
 <%
     }	
