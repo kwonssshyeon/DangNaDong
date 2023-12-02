@@ -41,22 +41,52 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
               try {
                 Class.forName("oracle.jdbc.driver.OracleDriver"); 
                 conn = DriverManager.getConnection(url, user, pass); 
-                String query = "SELECT Member_id FROM MEMBER WHERE Member_id = 'Mid1'";              
-                pstmt = conn.prepareStatement(query);
-                rs = pstmt.executeQuery(); 
+                
+
+                String currentMemberId = "Mid267"; // 실제로 로그인한 회원 ID로 대체하세요
+
+                // 단계 1: 현재 멤버의 모든 채팅방을 가져오기
+                String chatRoomsQuery = "SELECT DISTINCT Chat_room_id FROM ONE_TO_ONE_CHAT WHERE Member_id = ?";
+                pstmt = conn.prepareStatement(chatRoomsQuery);
+                pstmt.setString(1, currentMemberId);
+                rs = pstmt.executeQuery();
                 
                 while (rs.next()) {
-            %>
-            <div class="col mb-4">
-              <div class="card" style="border: 1px solid #ffc300; border-radius: 5px; padding: 10px;">
-                <div class="card-body">
-                  <h5 class="card-title" style="text-align:center;"><%= rs.getString(1) %></h5>
-                  <a href="./myPage.jsp" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">1:1 메세지</a>
-                </div>
-              </div>
-            </div>
-            <%
-                } 
+                    int chatRoomId = rs.getInt("Chat_room_id");
+
+                    // 단계 2: 현재 채팅방에 속한 모든 다른 회원 ID 가져오기
+                    String membersQuery = "SELECT DISTINCT Member_id FROM ONE_TO_ONE_CHAT WHERE Chat_room_id = ? AND Member_id != ?";
+                    pstmt = conn.prepareStatement(membersQuery);
+                    pstmt.setInt(1, chatRoomId);
+                    pstmt.setString(2, currentMemberId);
+                    ResultSet membersRs = pstmt.executeQuery();
+
+                    while (membersRs.next()) {
+                        String otherMemberId = membersRs.getString("Member_id");
+
+                        // 단계 3: 다른 회원의 닉네임 가져오기
+                        String nicknameQuery = "SELECT Nickname FROM MEMBER WHERE Member_id = ?";
+                        pstmt = conn.prepareStatement(nicknameQuery);
+                        pstmt.setString(1, otherMemberId);
+                        ResultSet nicknameRs = pstmt.executeQuery();
+
+                        if (nicknameRs.next()) {
+                            String otherMemberNickname = nicknameRs.getString("Nickname");
+        %>
+                            <div class="col mb-4">
+                                <div class="card" style="border: 1px solid #ffc300; border-radius: 5px; padding: 10px;">
+                                    <div class="card-body">
+                                        <h5 class="card-title" style="text-align:center;"><%= otherMemberNickname %> (<%= otherMemberId %>)</h5>
+                                        <a href="./chat.jsp?chat_room_id=<%= chatRoomId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">1:1 메세지</a>
+                                    </div>
+                                </div>
+                            </div>
+        <%
+                        }
+                        nicknameRs.close();
+                    }
+                    membersRs.close();
+                }
                 rs.close(); 
                 pstmt.close(); 
                 conn.close(); 

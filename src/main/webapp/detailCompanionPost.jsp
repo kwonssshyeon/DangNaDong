@@ -48,7 +48,7 @@
 	Connection conn = null;
 	PreparedStatement pstmt;
 	ResultSet rs;
-	Class.forName("oracle.jdbc.driver.OracleDriver");
+	Class.forName("oracle.jdbc.driver.OracleDriver"); 
 	conn = DriverManager.getConnection(url,user,pass);
 	
 	

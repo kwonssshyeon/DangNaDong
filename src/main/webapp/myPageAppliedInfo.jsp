@@ -18,11 +18,17 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
     function acceptRequestState(userId) {
         $('#acceptModal').modal('show');
         handleState("수락");
+        setTimeout(function () {
+         	  window.location.href = "./myPageAppliedInfo.jsp";
+           },1500);
     }
 
     function rejectRequestState(userId) {
         $('#rejectModal').modal('show');
         handleState("거절");
+        setTimeout(function () {
+         	  window.location.href = "./myPageAppliedInfo.jsp";
+           },1500);
     }
 
     function handleState(requestState) {
@@ -72,16 +78,22 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
               Connection conn = null; 
               PreparedStatement pstmt; 
               ResultSet rs;
+
+              String currentMemberId = "Mid1"; // 실제로 로그인한 회원 ID로 대체하세요
               
               try {
                 Class.forName("oracle.jdbc.driver.OracleDriver"); 
                 conn = DriverManager.getConnection(url, user, pass); 
-                String query = "SELECT AP.Member_id, TC.Title, AP.Request_state FROM TRAVEL_COMPANION_POST TC JOIN APPLICATION_INFO AP ON AP.Post_id = TC.Post_id WHERE TC.Member_id = 'Mid1'";     
-				pstmt = conn.prepareStatement(query);
+                String query = "SELECT AP.Member_id, M.Nickname,TC.Title,AP.Request_state,TC.Post_id FROM TRAVEL_COMPANION_POST TC JOIN APPLICATION_INFO AP ON AP.Post_id = TC.Post_id JOIN MEMBER M ON M.Member_id = AP.Member_id WHERE TC.Member_id = ?";     
+				//M.Meber_id : 신청한 유저 아이디
+				//Where Member_id : 로그인 유저
+                pstmt = conn.prepareStatement(query);
+				pstmt.setString(1,currentMemberId);
                 rs = pstmt.executeQuery(); 
                 
                 while (rs.next()) {
                 	String member_id = rs.getString("Member_id");
+                	int PostId=rs.getInt("Post_id");
             %>
             <script>
 			    var member_id = '<%= member_id %>';
@@ -90,10 +102,11 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
               <div class="card" style="border: 1px solid #ffc300; border-radius: 5px; padding: 10px;">
                 <img src="..." class="card-img-top" alt="...">
                 <div class="card-body">
-                  <h5 class="card-title"><%= rs.getString(2) %></h5>
+                  <h5 class="card-title"><%= rs.getString(3) %></h5>
                   <p class="card-text">신청하는 유저 아이디(테스트) : <%= rs.getString(1) %></p>
-                  <p class="card-text">현재 요청 상태 : <%= rs.getString(3) %></p>
-                  <a href="./myPage.jsp" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
+                  <p class="card-text">신청하는 유저 아이디(테스트) : <%= rs.getString(2) %></p>
+                  <p class="card-text">현재 요청 상태 : <%= rs.getString(4) %></p>
+                  <a href="./myPageCompanionPost.jsp?Post_id=<%= PostId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
                  <button type="button" class="btn btn-warning" onclick="acceptRequestState('<%= rs.getString(1) %>')" style="background-color: #ffc300; color: #ffffff;">수락</button>
       			 <button type="button" class="btn btn-warning" onclick="rejectRequestState('<%= rs.getString(1) %>')" style="background-color: #ffc300; color: #ffffff;">거절</button>
                 

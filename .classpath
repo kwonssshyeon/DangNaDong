@@ -13,7 +13,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="C:/oracle/ojdbc10.jar"/>
-	<classpathentry kind="lib" path="C:/oracle/orai18n.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/oracle/Oracle JDBC Drivers/ojdbc10.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/oracle/orai18n-23.3.0.23.09.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

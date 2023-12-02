@@ -40,13 +40,19 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
               PreparedStatement pstmt; 
               ResultSet rs;
               
+              String currentMemberId = "Mid77"; // 실제로 로그인한 회원 ID로 대체하세요
+
+              
               try {
                 Class.forName("oracle.jdbc.driver.OracleDriver"); 
                 conn = DriverManager.getConnection(url, user, pass); 
-                String query = "SELECT AP.Member_id, TC.Title, AP.Request_state FROM TRAVEL_COMPANION_POST TC JOIN APPLICATION_INFO AP ON AP.Post_id = TC.Post_id WHERE AP.Member_id = 'Mid77'"; 				pstmt = conn.prepareStatement(query);
+                String query = "SELECT AP.Member_id, TC.Title, AP.Request_state,AP.Post_id FROM TRAVEL_COMPANION_POST TC JOIN APPLICATION_INFO AP ON AP.Post_id = TC.Post_id WHERE AP.Member_id = ?"; 				
+                pstmt = conn.prepareStatement(query);
+                pstmt.setString(1,currentMemberId);
                 rs = pstmt.executeQuery(); 
                 
                 while (rs.next()) {
+                	int PostId=rs.getInt("Post_id");
             %>
             <div class="col mb-4">
               <div class="card" style="border: 1px solid #ffc300; border-radius: 5px; padding: 10px;">
@@ -55,7 +61,7 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                   <h5 class="card-title"><%= rs.getString(2) %></h5>
                   <p class="card-text">글을 보고 신청한 사람 아이디(테스트) : <%= rs.getString(1) %></p>
                   <p class="card-text">현재 요청 상태 : <%= rs.getString(3) %></p>
-                  <a href="./myPage.jsp" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
+                  <a href="./myPageCompanionPost.jsp?Post_id=<%= PostId %>"class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
                   
         </div>
               </div>

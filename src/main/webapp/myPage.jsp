@@ -12,11 +12,24 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="./js/myPage.js"></script>
 	<script>
+    
 	 function handleUpdateComplete() {
          var nickname = document.getElementById("nickname").value;
          var introduction = document.getElementById("introduction").value;
          var email = document.getElementById("email").value;
          var birthdate = document.getElementById("birthdate").value;
+         // 선택한 이미지 파일 가져오기
+         var selectedImageFile = document.getElementById("fileInput").files[0];
+         
+         // 데이터 중 null 값 체크
+         if (!nickname || !introduction || !email || !birthdate) {
+           // 입력값 중 null 값 존재함.
+           $("#invalidInfoModal").modal("show");
+           return;
+         }
+         
+         console.log("selectedImage : ",selectedImageFile);
+		 console.log("selectedImage : ",selectedImageFile.name);
          
          	//여기서 서버로 이동
 			$.ajax({
@@ -27,7 +40,8 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
              nickname: nickname,
              introduction: introduction,
              email: email,
-             birthdate: birthdate
+             birthdate: birthdate,
+             profile_image:selectedImageFile.name
            },
            success: function (response) {
              // 서버에서의 처리가 성공했을 때의 동작
@@ -59,8 +73,73 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
         <div class="contentArea">
           <h3 style="margin-bottom: 30px;">개인 정보 수정</h3>
           <div class="imageBtu">
-		<label class="imgBtu" for="fileInput">프로필<img id="selectedImage" class="selected-image" src="#" alt="Selected Image"></label>
-		    <input type="file" id="fileInput" class="file-input" onchange="handleFileSelect(this)">
+         <% 
+              String serverIP = "localhost"; 
+              String strSID = "orcl"; 
+              String portNum = "1521";
+              String user = "university"; 
+              String pass = "comp322"; 
+              String url = "jdbc:oracle:thin:@" + serverIP + ":" +portNum + ":" + strSID; 
+              Connection conn = null; 
+              PreparedStatement pstmt = null; 
+              ResultSet rs = null; 
+                        
+              String profileImageSrc = ""; // 초기화
+
+              try {
+                Class.forName("oracle.jdbc.driver.OracleDriver"); 
+                conn = DriverManager.getConnection(url, user, pass); 
+                
+
+                String currentMemberId = "Mid1"; // 실제로 로그인한 회원 ID로 대체하세요
+
+                String query = "select Profile_image from MEMBER where Member_id=?";
+                pstmt = conn.prepareStatement(query);
+                pstmt.setString(1, currentMemberId);
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    String profileImagePath = rs.getString("Profile_image");
+                %>
+				 <script>
+		    // Wrap your code in a function
+		    function updateProfileImage() {
+		        var profileImagePath = '<%= profileImagePath %>';
+		        console.log("profileImagePath test: " + profileImagePath);
+		
+		        // profileImagePath가 null이면 label과 input을 보여줌
+		        if (profileImagePath === null) {
+		            document.getElementById("profileImage").style.display = "block";
+		        } else {
+		            // profileImagePath가 null이 아니면 이미지를 보여줌
+		            var selectedImage = document.getElementById("selectedImage");
+		            if (selectedImage) {
+		                selectedImage.src = profileImagePath;
+		                selectedImage.style.display = "block";
+            }
+        }
+    }
+
+    // Call the function after the document has fully loaded
+    document.addEventListener("DOMContentLoaded", updateProfileImage);
+</script>
+
+                <%
+                }
+              } catch (Exception e) {
+                  e.printStackTrace();
+              } finally {
+                  try {
+                      if (rs != null) rs.close();
+                      if (pstmt != null) pstmt.close();
+                      if (conn != null) conn.close();
+                  } catch (SQLException e) {
+                      e.printStackTrace();
+                  }
+              }
+                %>
+		<label class="imgBtu" for="fileInput" id="profileImage">프로필<img id="selectedImage" class="selected-image" src="" alt="Selected Image"></label>
+		<input type="file" id="fileInput" class="file-input" onchange="handleFileSelect(this)">
           </div>
          <div class="mb-3">
 		  <label for="formGroupExampleInput" class="form-label">닉네임</label>
@@ -108,6 +187,37 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
     <span class="close" onclick="hidePopup('successPopup')">&times;</span>
   </div>
 </div>
+    <!-- "정확한 정보를 기입해주세요" 모달 -->
+    <div class="modal" id="invalidInfoModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">입력 오류</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>정확한 정보를 기입해주세요.</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
   </body>
