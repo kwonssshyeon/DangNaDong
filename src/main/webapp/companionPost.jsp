@@ -11,6 +11,7 @@
 <meta charset="UTF-8">
 <title>여행 동행글 쓰기</title>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
 <script>
    $(function(){
 	    $("#navbar").load("layout/navbar.html");
