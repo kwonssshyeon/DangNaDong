@@ -56,18 +56,17 @@ public class ChatMessagesServlet extends HttpServlet {
 	    	   conn = DatabaseCon.connectToDatabase();
 	    	   conn.setAutoCommit(false);
 	          
-	    	  String query = "INSERT INTO ONE_TO_ONE_CHAT (chat_id,chat_room_id,Member_id,Message) VALUES (?,?,?,?) ";
-	          try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-	        	  pstmt.setInt(1, 1129);//chat_id 테스트 용도
-	        	  pstmt.setString(2,chat_room_id);
-	              pstmt.setString(3, member_id);
-	              pstmt.setString(4, message);
+	    	   String query = "INSERT INTO ONE_TO_ONE_CHAT (chat_id, chat_room_id, Member_id, Message) VALUES (chat_id_seq.NEXTVAL, ?, ?, ?)";
+	    	   try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+	    	       pstmt.setString(1, chat_room_id);
+	    	       pstmt.setString(2, member_id);
+	    	       pstmt.setString(3, message);
 
-	              int rowsAffected = pstmt.executeUpdate();
-	              System.out.println(rowsAffected + " row(s) updated"); // 디버깅을 위한 출력
+	    	       int rowsAffected = pstmt.executeUpdate();
+	    	       System.out.println(rowsAffected + " row(s) updated"); // 디버깅을 위한 출력
 
-	              conn.commit();
-	          }
+	    	       conn.commit();
+	    	   }
 	         
 	      } catch (SQLException e) {
 	          e.printStackTrace();

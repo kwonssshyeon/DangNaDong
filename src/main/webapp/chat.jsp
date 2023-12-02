@@ -8,6 +8,27 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <link rel="stylesheet" href="./css/myPageStyle.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <style>
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            border: 1px solid #ffc300;
+            border-radius: 5px; 
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+
+        .message.sent {
+        
+            align-self: flex-end;
+        }
+
+        .message.received {
+         
+            align-self: flex-start;
+        }
+    </style>
     <script>
     $(function () {
         $("#navbar").load("layout/navbar.html");
@@ -20,6 +41,12 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
         console.log('Member ID(sender):', member_id); 
         console.log('message : ',message);
         console.log('chat room id : ',chat_room_id);
+        
+        if (!message) {
+            // 메세지에 값을 입력하지 않음
+            $('#rejectModal').modal('show');
+            return;
+        }
         // 여기서 서버로 이동
         $.ajax({
             type: "POST",
@@ -32,6 +59,12 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
             success: function (response) {
                 // 서버에서의 처리가 성공했을 때의 동작
                 console.error("sent successfully : ");
+
+                // 모달을 보여줌
+                $('#acceptModal').modal('show');
+                setTimeout(function () {
+               	  window.location.href = "./chat.jsp"+"?chat_room_id="+chat_room_id;
+                 },1500);
             },
             error: function (error) {
                 // 서버에서의 처리가 실패했을 때의 동작
@@ -75,12 +108,19 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
               try {
                 Class.forName("oracle.jdbc.driver.OracleDriver"); 
                 conn = DriverManager.getConnection(url, user, pass); 
-                String query = "select Chat_room_id,Member_id,Message from ONE_TO_ONE_CHAT where Member_id='Mid129'";              
-                pstmt = conn.prepareStatement(query);
-                rs = pstmt.executeQuery(); 
                 
+                
+                String chatRoomId = request.getParameter("chat_room_id");
+                //String query = "select Chat_room_id,Member_id,Message from ONE_TO_ONE_CHAT where Member_id='Mid129'";  
+                
+                String query = "select Member_id,Message from ONE_TO_ONE_CHAT where chat_room_id=?";
+                pstmt = conn.prepareStatement(query);
+                pstmt.setString(1, chatRoomId);
+                
+                rs = pstmt.executeQuery(); 
+                     
                 while (rs.next()) {
-                    String chat_room_id = rs.getString("Chat_room_id");
+                    String chat_room_id = chatRoomId;
                     String member_id = rs.getString("Member_id");
                     String message = rs.getString("Message");
             %>
@@ -88,10 +128,19 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
 			    var member_id = '<%= member_id %>';
 			    var chat_room_id = '<%= chat_room_id %>';
 			</script>
-				<div>
-				    <p><strong>보내는 사람:</strong> <%= member_id %></p>
-				    <p><strong>메시지:</strong> <%= message %></p>
-				</div>
+				    <div class="message-container">
+				        <% if (member_id.equals("Mid267")) { %>  
+						            <div class="message sent">
+		                <p><strong>보내는 사람:</strong> <%= member_id %></p>
+		                <p><strong>메시지:</strong> <%= message %></p>
+		            </div>
+		        <% } else { %>
+		            <div class="message received">
+		                <p><strong>보내는 사람:</strong> <%= member_id %></p>
+		                <p><strong>메시지:</strong> <%= message %></p>
+		            </div>
+		        <% } %>
+		    </div>
             <%
             
                 } 
@@ -137,6 +186,19 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="acceptModalLabel">메세지를 전송하였습니다.</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="acceptModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="acceptModalLabel">올바른 값을 입력해주세요.</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>

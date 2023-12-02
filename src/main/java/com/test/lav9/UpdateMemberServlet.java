@@ -37,6 +37,8 @@ public class UpdateMemberServlet extends HttpServlet {
       String introduction = request.getParameter("introduction");
       String email = request.getParameter("email");
       String birthdateStr = request.getParameter("birthdate");
+      String profile_image = request.getParameter("profile_image"); // 변경된 부분
+
       
       // 로깅: 파라미터 값 확인
       System.out.println("Received Parameters: ");
@@ -45,6 +47,7 @@ public class UpdateMemberServlet extends HttpServlet {
       System.out.println("introduction: " + introduction);
       System.out.println("email: " + email);
       System.out.println("birthdate: " + birthdateStr);
+      System.out.println("profile_image: " + profile_image);
       
       
       // 문자열 형식의 날짜를 Date 객체로 변환
@@ -65,13 +68,14 @@ public class UpdateMemberServlet extends HttpServlet {
     	   conn = DatabaseCon.connectToDatabase();
     	   conn.setAutoCommit(false);
 
-          String query = "UPDATE MEMBER SET Nickname=?, Self_introdution=?, E_mail=?, Birth=? WHERE Member_id=?";
+          String query = "UPDATE MEMBER SET Nickname=?, Self_introdution=?, E_mail=?, Birth=?,Profile_image=? WHERE Member_id=?";
           try (PreparedStatement pstmt = conn.prepareStatement(query)) {
               pstmt.setString(1, nickname);
               pstmt.setString(2, introduction);
               pstmt.setString(3, email);
               pstmt.setDate(4, new java.sql.Date(birthdate.getTime())); // Date 객체를 SQL Date로 변환
-              pstmt.setString(5, member_id);
+              pstmt.setString(5, profile_image);
+              pstmt.setString(6, member_id);
 
               int rowsAffected = pstmt.executeUpdate();
               System.out.println(rowsAffected + " row(s) updated"); // 디버깅을 위한 출력
