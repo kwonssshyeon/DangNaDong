@@ -2,12 +2,13 @@
 <%@ page language="java" import="java.text.*,java.sql.*" %>
 <%@ page language="java" import="java.time.LocalDateTime,java.time.LocalDate" %>
 <%@ page language="java" import="java.time.format.DateTimeFormatter" %>
-<%@ page import="javax.servlet.*,javax.servlet.http.*" %>
+<%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
+<%@ page import="com.oreilly.servlet.MultipartRequest" %>
 <%@ page import="com.chat" %> 
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="EUC-KR">
+<meta charset="UTF-8">
 <title>DND</title>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -108,7 +109,7 @@ $(document).ready(function() {
     var location = '<%= location %>';
     
     $("#sendBtn").on("click", function() {
-    	func();
+    	
         $.ajax({
             type: "POST",
             url: "addChat",
@@ -118,7 +119,7 @@ $(document).ready(function() {
             		
             success: function(response) {
                 alert(response);
-                location.reload();
+                window.location.reload();
                
             },
             error: function(error) {
@@ -130,6 +131,7 @@ $(document).ready(function() {
 });
 
 </script>
+
   <section class="mb-5">
       <div class="card bg-light">
           <div class="card-body">
@@ -150,7 +152,7 @@ $(document).ready(function() {
 			        <div class="chat-message">
 			            <strong><%= nickname %>:</strong> <%= message %>
 			            
-			            <small><%= sendTime %>, <%= senderLocation %></small>
+			            <small> | <%= sendTime %>, <%= senderLocation %></small>
 			        </div>
 				<%
 				}
@@ -162,7 +164,7 @@ $(document).ready(function() {
     
     
 <div class="input-group">
-    <input type="text" id="message" class="form-control">
+    <input type="text" id="message" class="form-control" onchange='func()'>
     <button type="button" id="sendBtn" class="btn btn-primary">전송</button>
 </div>
 	
