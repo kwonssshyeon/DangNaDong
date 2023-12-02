@@ -42,6 +42,8 @@
 %>
 
 <%!
+//HttpSession s = request.getSession();
+//String member_id = (String)s.getAttribute("member_id");
 int post_id=1664;
 int reply_id;
 String member_id="Mid1";
