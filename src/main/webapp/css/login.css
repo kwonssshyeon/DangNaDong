@@ -1,0 +1,52 @@
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.title {
+	max-width: 600px;
+    padding: 50px;
+}
+
+.title h1{
+	color: #FFC300;
+}
+
+.loginForm {
+  max-width: 600px;
+  padding: 25px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.input {
+  margin-bottom: 10px;
+}
+
+.input label {
+	/*적용이 안되고 있는데..*/
+  font-size: 14px;
+  color: #FFC300;
+}
+
+.input input {
+  width: 92%;
+  padding: 8px;
+}
+
+.loginBtn {
+  text-align: center;
+}
+
+.loginBtn input {
+  background-color: #ffc300;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

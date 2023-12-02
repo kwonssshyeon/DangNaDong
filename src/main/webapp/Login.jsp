@@ -1,14 +1,25 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page language="java" import="java.text.*,java.sql.*" %>
-    
+<%@ page import="java.io.*,java.util.*" %>
+<%@ page import="javax.servlet.*,javax.servlet.http.*" %>
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="EUC-KR">
-<title>DND:Login</title>
+<meta charset="UTF-8">
+<title>DND:Login Success</title>
+<link rel="stylesheet" href="./css/loginFail.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script>
+   $(function(){
+	    $("#navbar").load("layout/navbar.html");
+	    $("#footer").load("layout/footer.html");
+	});
+</script>
+
 </head>
 <body>
+
 <% 
 
 	String member_id = request.getParameter("member_id");
@@ -34,21 +45,24 @@
     rs = pstmt.executeQuery();
     
     if (rs.next()) {
-        out.println("<p>Login successful! Welcome, " + member_id + "!</p>");
+        HttpSession s = request.getSession();
+        s.setAttribute("member_id", member_id);
+        //메인으로 바로 이동
+        response.sendRedirect("main.jsp");
     } else {
-        out.println("<p>Login failed. Please check your ID and password.</p>");
+%>
+       <div class="fail">
+			<h2>! 로그인 실패 !</h2>
+			<h2>아이디와 비밀번호를 확인하세요.</h2>
+			<h2>아직 DangNaDong 회원이 아니신가요?</h2>
+			<a href="signup.html">회원가입하기</a>
+		</div>
+<%
     }	
 %>
 
 
-<h2>Login Information</h2>
-	<ul>
-		<li><p>ID : 
-			<b><%= request.getParameter("member_id")%></b>
-		</p></li>
-		<li><p>PW : 
-			<b><%= request.getParameter("user_password") %></b>
-		</p></li>
-	</ul>
+
+<div id="footer"></div>
 </body>
 </html>

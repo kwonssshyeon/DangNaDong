@@ -2,20 +2,34 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="./css/signup.css">
 <title>DND:SingUp</title>
 </head>
 <body>
-	<h2>DangNaDong</h2><br>
-	<form action="Signup.jsp" method="post">
-	아이디 <input type = "text" name = "member_id"/><br>
-	비밀번호 <input type = "text" name = "user_password"/><br>
-	생년월일(2020-20-20) <input type = "text" name = "birth"/><br>
-	자기소개 <input type = "text" name = "self_introduction"/><br>
-	이메일 <input type = "text" name = "e_mail"/><br>
-	성별(F/M) <input type = "text" name = "gender"/><br>
-	별명 <input type = "text" name = "nickname"/><br>
-	포르필이미지 <input type = "text" name = "profile_image"/><br>
-	<input type="submit" value="회원가입" />
+	<div class="title">
+		<h1>DangNaDong</h1>
+	</div>
+	
+	<form action="signup.jsp" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+		<div class="signupForm">
+			<div class="innerForm">
+				아이디 <input type = "text" name = "member_id"/><br>
+				별명 <input type = "text" name = "nickname"/><br>
+				자기소개 <input type = "text" name = "self_introduction"/><br>
+				생년월일 <input type = "date" name = "b" min="1950-01-01" max="2022-12-31"/><br>
+			</div>
+			<div class="innerForm">
+				이메일 <input type = "text" name = "e_mail"/><br>
+				비밀번호 <input type = "text" name = "user_password"/><br>
+				프로필 이미지 <input type = "file" name = "profile_image"/><br>
+				성별(F/M) <input type = "text" name = "gender"/><br>
+			</div>
+		</div>	
+		<div class="signupBtn">
+		    <input type="submit" value="회원가입"/>
+		</div>
+		
 	</form>
+	
 </body>
 </html>
