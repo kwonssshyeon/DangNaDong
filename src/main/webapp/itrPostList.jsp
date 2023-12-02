@@ -26,7 +26,10 @@
 </head>
 <body>
 <div id="navbar"></div>
-
+<%
+	HttpSession s = request.getSession();
+	String my_id = (String)s.getAttribute("member_id");
+%>
 <h4>일정 소개 글</h4>
 <%
 	SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-M-d HH:mm:ss");
@@ -50,7 +53,7 @@
 <div class="container mt-5">
     <div class="row row-cols-md-3">
             <%
-            	String sql = "select p.title, p.travel_period, m.nickname, p.creation_time p.post_id from travel_introduction_post p, member m, itr_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = 'KOR'";
+            	String sql = "select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id from travel_introduction_post p, member m, itr_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = 'KOR'";
             	pstmt = conn.prepareStatement(sql);
             	rs = pstmt.executeQuery();
             	
@@ -75,7 +78,7 @@
 			                    <p class="card-text"><%= nickname %></p>
 			                    <p class="card-text"><%= date %></p>
 		                    </div>
-	                    	<a href="#" id="detailBtn" class="btn btn-primary d-flex align-items-center justify-content-center">자세히 보기</a>
+	                    	<a href="detailIntroducePost.jsp?post_id=<%= post_id %>" id="detailBtn" class="btn btn-primary d-flex align-items-center justify-content-center">자세히 보기</a>
 	                    </div>
                 	</div>
                 </div>
