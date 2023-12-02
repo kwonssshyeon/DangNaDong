@@ -68,7 +68,7 @@
 
 <div class="btns">
 	<div class="btn">
-	    <button onclick="location.href='동행찾기글 보는 페이지'">동행 찾기 글 보기</button>
+	    <button onclick="location.href='cpnPostList.jsp'">동행 찾기 글 보기</button>
 	 </div>
 	 <div class="btn">
 		<button onclick="location.href='itrPostList.jsp'">일정 소개 글 보기</button>
