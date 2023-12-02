@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
+<%@ page import="javax.servlet.*,javax.servlet.http.*" %>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -39,7 +40,10 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
               PreparedStatement pstmt; 
               ResultSet rs;
               
-              String currentMemberId = "Mid1"; // 실제로 로그인한 회원 ID로 대체하세요
+              HttpSession s = request.getSession();
+              String currentMemberId = (String)s.getAttribute("member_id");
+				
+              //String currentMemberId = "Mid1"; // 실제로 로그인한 회원 ID로 대체하세요
 
               try {
                 Class.forName("oracle.jdbc.driver.OracleDriver"); 
