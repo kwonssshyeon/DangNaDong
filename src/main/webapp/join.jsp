@@ -1,30 +1,36 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page language="java" import="java.lang.Integer" %>
 <%@ page language="java" import="java.text.*,java.sql.*" %>
-<%@ page import="java.io.*,java.util.*" %>
-<%@ page import="javax.servlet.*,javax.servlet.http.*" %>
+<%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
+<%@ page import="com.oreilly.servlet.MultipartRequest" %>
+    
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>DND:Login Success</title>
-<link rel="stylesheet" href="./css/loginFail.css">
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script>
-   $(function(){
-	    $("#navbar").load("layout/navbar.html");
-	    $("#footer").load("layout/footer.html");
-	});
-</script>
-
+<link rel="stylesheet" href="./css/signup.css">
+<title>DND:Sign-up Successful</title>
 </head>
 <body>
-
 <% 
+//아직 안바뀐 경로
+	String directory = "C:/Users/owner/eclipse-Dangnadong/DangNaDong/src/main/webapp/image/";
+	int maxSize = 1024*1024*100;
+	String encoding = "UTF-8";
 
-	String member_id = request.getParameter("member_id");
-	String password = request.getParameter("user_password");
-	
+	MultipartRequest multipartRequest = new MultipartRequest(request, directory, maxSize, encoding,
+		new DefaultFileRenamePolicy());
+
+	String member_id = multipartRequest.getParameter("member_id");
+	String password = multipartRequest.getParameter("user_password");
+	String brith = multipartRequest.getParameter("b");
+	String selfitr = multipartRequest.getParameter("self_introduction");
+	String email = multipartRequest.getParameter("e_mail");
+	String gender = multipartRequest.getParameter("gender");
+	String nickname = multipartRequest.getParameter("nickname");
+	String image_url = multipartRequest.getOriginalFileName("profile_image");
+	//String image_name = multipartRequest.getFilesystemName("profile_image");
 	
 	String serverIP = "localhost";
 	String strSID = "orcl";
@@ -39,30 +45,19 @@
 	Class.forName("oracle.jdbc.driver.OracleDriver");
 	conn = DriverManager.getConnection(url,user,pass);
 	
-    String sql = "SELECT * FROM member WHERE member_id='"+member_id+"' AND user_password='"+password+"'";
-    pstmt = conn.prepareStatement(sql);
-    //out.println(sql);
-    rs = pstmt.executeQuery();
-    
-    if (rs.next()) {
-        HttpSession s = request.getSession();
-        s.setAttribute("member_id", member_id);
-        //메인으로 바로 이동
-        response.sendRedirect("main.jsp");
-    } else {
-%>
-       <div class="fail">
-			<h2>! 로그인 실패 !</h2>
-			<h2>아이디와 비밀번호를 확인하세요.</h2>
-			<h2>아직 DangNaDong 회원이 아니신가요?</h2>
-			<a href="join.html">회원가입하기</a>
-		</div>
-<%
-    }	
+	String sql = "insert into member values('"+member_id+"','"+gender+"','"+brith+"','"+selfitr+"','"+email+"','"+nickname+"','"+password+"','"+image_url+"')";
+	pstmt = conn.prepareStatement(sql);
+	//out.println(sql);
+	rs = pstmt.executeQuery();
+	
+	//response.sendRedirect("main.jsp");
+	
 %>
 
+<div class="welcome">
+	<h2>♣ DangNaDong 에서 여행을 함께해요 ♣</h2>
+	<a href="signin.html">Go to Login</a>
+</div>
 
-
-<div id="footer"></div>
 </body>
 </html>
