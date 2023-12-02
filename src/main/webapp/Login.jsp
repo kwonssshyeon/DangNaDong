@@ -8,7 +8,7 @@
 <head>
 <meta charset="UTF-8">
 <title>DND:Login Success</title>
-
+<link rel="stylesheet" href="./css/loginFail.css">
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script>
    $(function(){
@@ -19,7 +19,7 @@
 
 </head>
 <body>
-<div id="navbar"></div>
+
 <% 
 
 	String member_id = request.getParameter("member_id");
@@ -50,11 +50,17 @@
         //메인으로 바로 이동
         response.sendRedirect("main.jsp");
     } else {
-        out.println("<p>Login failed. Please check your ID and password.</p>");
+%>
+       <div class="fail">
+			<h2>! 로그인 실패 !</h2>
+			<h2>아이디와 비밀번호를 확인하세요.</h2>
+			<h2>아직 DangNaDong 회원이 아니신가요?</h2>
+			<a href="signup.html">회원가입하기</a>
+		</div>
+<%
     }	
 %>
-<h2>아직 DangNaDong 회원이 아니신가요?</h2>
-<a href="signup.html">회원가입하기</a>
+
 
 
 <div id="footer"></div>
