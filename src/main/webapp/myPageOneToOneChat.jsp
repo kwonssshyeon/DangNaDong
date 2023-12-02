@@ -52,7 +52,7 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                 rs = pstmt.executeQuery();
                 
                 while (rs.next()) {
-                    int chatRoomId = rs.getInt("Chat_room_id");
+                    int chatRoomId = rs.getInt(1);
 
                     // 단계 2: 현재 채팅방에 속한 모든 다른 회원 ID 가져오기
                     String membersQuery = "SELECT DISTINCT Member_id FROM ONE_TO_ONE_CHAT WHERE Chat_room_id = ? AND Member_id != ?";

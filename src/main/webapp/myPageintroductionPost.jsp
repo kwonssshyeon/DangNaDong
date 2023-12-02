@@ -51,7 +51,7 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                 rs = pstmt.executeQuery(); 
                 
                 while (rs.next()) {
-                	int PostId=rs.getInt("Post_id");
+                	int PostId=rs.getInt(3);
             %>
             <div class="col mb-4">
               <div class="card" style="border: 1px solid #ffc300; border-radius: 5px; padding: 10px;">

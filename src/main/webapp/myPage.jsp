@@ -99,7 +99,7 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                 rs = pstmt.executeQuery();
 
                 while (rs.next()) {
-                    String profileImagePath = rs.getString("Profile_image");
+                    String profileImagePath = rs.getString(1);
                 %>
 				 <script>
 		    // Wrap your code in a function

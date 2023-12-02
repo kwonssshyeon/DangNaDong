@@ -92,8 +92,8 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                 rs = pstmt.executeQuery(); 
                 
                 while (rs.next()) {
-                	String member_id = rs.getString("Member_id");
-                	int PostId=rs.getInt("Post_id");
+                	String member_id = rs.getString(1);
+                	int PostId=rs.getInt(5);
             %>
             <script>
 			    var member_id = '<%= member_id %>';

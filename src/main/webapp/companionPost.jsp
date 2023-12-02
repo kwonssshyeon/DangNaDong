@@ -32,7 +32,11 @@
 	Connection conn = null;
 	PreparedStatement pstmt;
 	ResultSet rs;
-	Class.forName("oracle.jdbc.driver.OracleDriver");
+	try {
+	    Class.forName("oracle.jdbc.driver.OracleDriver");
+	} catch (ClassNotFoundException e) {
+	    e.printStackTrace();
+	}
 	conn = DriverManager.getConnection(url,user,pass);
 	
 	
