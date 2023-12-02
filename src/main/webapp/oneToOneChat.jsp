@@ -19,3 +19,13 @@ String my_id;
    my_id = request.getParameter("member");
    post_id = Integer.parseInt(request.getParameter("post"));
 %>
+
+
+</head>
+<body>
+<div id="navbar"></div>
+신청서
+<%=my_id %><%=post_id %>
+<div id="footer"></div>
+</body>
+</html>

@@ -118,14 +118,13 @@ $(document).ready(function() {
             		
             success: function(response) {
                 alert(response);
-                
+                location.reload();
                
             },
             error: function(error) {
                 alert(error);
             }
             
-            location.reload();
         });
     });
 });
@@ -164,7 +163,7 @@ $(document).ready(function() {
     
 <div class="input-group">
     <input type="text" id="message" class="form-control">
-    <button type="submit" id="sendBtn" class="btn btn-primary">전송</button>
+    <button type="button" id="sendBtn" class="btn btn-primary">전송</button>
 </div>
 	
 </div>

@@ -14,6 +14,7 @@
 </head>
 <body>
 <% 
+//아직 안바뀐 경로
 	String directory = "C:/Users/owner/eclipse-Dangnadong/DangNaDong/src/main/webapp/image/";
 	int maxSize = 1024*1024*100;
 	String encoding = "UTF-8";
@@ -55,7 +56,7 @@
 
 <div class="welcome">
 	<h2>♣ DangNaDong 에서 여행을 함께해요 ♣</h2>
-	<a href="login.html">Go to Login</a>
+	<a href="signin.html">Go to Login</a>
 </div>
 
 </body>
