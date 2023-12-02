@@ -50,7 +50,7 @@
 <div class="container mt-5">
     <div class="row row-cols-md-3">
             <%
-            	String sql = "select p.title, p.travel_period, m.nickname, p.creation_time from travel_introduction_post p, member m, itr_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = 'KOR'";
+            	String sql = "select p.title, p.travel_period, m.nickname, p.creation_time p.post_id from travel_introduction_post p, member m, itr_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = 'KOR'";
             	pstmt = conn.prepareStatement(sql);
             	rs = pstmt.executeQuery();
             	
@@ -59,6 +59,7 @@
             		String period = rs.getString(2);
             		String nickname = rs.getString(3);
             		String inputDate = rs.getString(4);
+            		int post_id = rs.getInt(5);
             		
             		Date dateForm = inputFormat.parse(inputDate);
             		String date = outputFormat.format(dateForm);

@@ -2,6 +2,7 @@
 <%@ page language="java" import="java.text.*,java.sql.*" %>
 <%@ page language="java" import="java.time.LocalDateTime,java.time.LocalDate" %>
 <%@ page language="java" import="java.time.format.DateTimeFormatter" %>
+<%@ page import="javax.servlet.*,javax.servlet.http.*" %>
 <%@ page import="com.chat" %> 
 <!DOCTYPE html>
 <html>
@@ -69,7 +70,7 @@
 	    <button onclick="location.href='동행찾기글 보는 페이지'">동행 찾기 글 보기</button>
 	 </div>
 	 <div class="btn">
-		<button onclick="location.href='일정소개글 보는 페이지'">일정 소개 글 보기</button>
+		<button onclick="location.href='itrPostList.jsp'">일정 소개 글 보기</button>
 	</div>
 </div>
 
@@ -117,11 +118,14 @@ $(document).ready(function() {
             		
             success: function(response) {
                 alert(response);
-                location.reload();
+                
+               
             },
             error: function(error) {
                 alert(error);
             }
+            
+            location.reload();
         });
     });
 });
@@ -160,7 +164,7 @@ $(document).ready(function() {
     
 <div class="input-group">
     <input type="text" id="message" class="form-control">
-    <button type="button" id="sendBtn" class="btn btn-primary">전송</button>
+    <button type="submit" id="sendBtn" class="btn btn-primary">전송</button>
 </div>
 	
 </div>
