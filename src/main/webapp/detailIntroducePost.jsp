@@ -41,6 +41,7 @@
 	conn = DriverManager.getConnection(url,user,pass);
 %>
 
+
 <%
 HttpSession s = request.getSession();
 int post_id = Integer.parseInt(request.getParameter("post_id"));
