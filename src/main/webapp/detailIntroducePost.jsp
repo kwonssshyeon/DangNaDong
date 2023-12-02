@@ -231,7 +231,7 @@ $(document).ready(function() {
 	
 	
 	
-	<!-- Comments section-->
+  <!-- Comments section-->
   <section class="mb-5">
       <div class="card bg-light">
           <div class="card-body">

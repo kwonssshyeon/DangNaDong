@@ -4,7 +4,7 @@
 <%@ page language="java" import="java.time.format.DateTimeFormatter" %>
 <%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
 <%@ page import="com.oreilly.servlet.MultipartRequest" %>
-<%@ page import="com.apply" %>
+
 
 <!DOCTYPE html>
 <html>
@@ -29,6 +29,7 @@
 	var chatting = function(member_id,post_id) {			
 		location.href = "oneToOneChat.jsp?member="+member_id+"&post="+post_id;
 		//location.href = "detailCompanionPost.jsp";
+		//location.href = "oneToOneChat.jsp"
 	};
 </script>
 
