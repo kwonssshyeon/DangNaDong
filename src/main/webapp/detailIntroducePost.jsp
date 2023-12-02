@@ -41,13 +41,13 @@
 	conn = DriverManager.getConnection(url,user,pass);
 %>
 
-<%!
-//HttpSession s = request.getSession();
-//String member_id = (String)s.getAttribute("member_id");
-int post_id=1664;
+
+<%
+HttpSession s = request.getSession();
+int post_id = Integer.parseInt(request.getParameter("post_id"));
 int reply_id;
-String member_id="Mid1";
-String my_id="Mid2";
+//String member_id="Mid1";
+String my_id = (String)s.getAttribute("member_id");
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 %>
 <script type="text/javascript">
