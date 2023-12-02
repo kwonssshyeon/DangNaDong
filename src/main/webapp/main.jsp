@@ -55,8 +55,8 @@
 		<form action="" name="post">
 			<select name="write" onchange="location=document.post.write.value">
 				<option>글쓰기</option>
-				<option value="companionPost.html">동행찾기 글쓰기</option>
-				<option value="introducePost.html">일정소개 글쓰기</option>
+				<option value="companionPost.jsp">동행찾기 글쓰기</option>
+				<option value="introducePost.jsp">일정소개 글쓰기</option>
 			</select>
 		</form>
 	</div>

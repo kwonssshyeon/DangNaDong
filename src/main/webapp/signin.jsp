@@ -60,7 +60,15 @@
 <%
     }	
 %>
+<%
+//모집일 지난글 상태 마감으로 고치기
+String stateSql = "update travel_companion_post set state='마감' where deadline<=(SELECT SYSDATE FROM DUAL)";
+conn.setAutoCommit(false);
+pstmt = conn.prepareStatement(stateSql);
+pstmt.executeUpdate();
+conn.commit();
 
+%>
 
 
 <div id="footer"></div>
