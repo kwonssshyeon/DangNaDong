@@ -55,47 +55,47 @@ String nation="";
 		<div id="location" name="location"><%=nation %></div>
 		<div class="mb-3">
 		  <label for="formGroupExampleInput" class="form-label">제목</label>
-		  <input type="text" name="title" class="form-control" id="formGroupExampleInput" placeholder="Example input placeholder">
+		  <input type="text" name="title" class="form-control" id="formGroupExampleInput" placeholder="제목을 입력하세요" required >
 		</div>
 		<div class="input-group mb-3">
 		  <span class="input-group-text" id="basic-addon1">여행날짜 선택</span>
 		  <input type="date" id="currentDate" name="travel_date" min="2023-01-01" max="2023-12-31" class="form-control">
 		  <span class="input-group-text" id="basic-addon1">여행기간</span>
-		  <input type="text" name="travel_period" class="form-control" id="formGroupExampleInput" placeholder="Example input placeholder">
+		  <input type="text" name="travel_period" class="form-control" id="formGroupExampleInput" placeholder="O박O일">
 		</div>
 		
 		  <div class="col-sm-5">
 			  <div class="input-group mb-3">
 			<span class="input-group-text" id="basic-addon1">모집마감일</span>
-		    <input type="date" name="deadline" min="2023-01-01" max="2023-12-31" class="form-control">
+		    <input type="date" name="deadline" min="2023-01-01" max="2023-12-31" class="form-control" required>
 		    </div>
 		    <div class="input-group mb-3">
 		  <span class="input-group-text" id="basic-addon1">예상비용</span>
-		  <input type="text" name="expected_cost" class="form-control">
+		  <input type="text" name="expected_cost" class="form-control" placeholder="O만원대">
 		</div>
 		  </div>
 		
 		모집인원
 		<div class="input-group mb-3">
 		  <span class="input-group-text" id="basic-addon1">인원수</span>
-		  <input type="number" name="number_of_recruited" class="form-control" id="formGroupExampleInput" placeholder="Example input placeholder">
+		  <input type="number" name="number_of_recruited" class="form-control" id="formGroupExampleInput" required>
 		  <span class="input-group-text" id="basic-addon1">성별</span>
-		  <input type="text" name="gender_condition" class="form-control" id="formGroupExampleInput" placeholder="Example input placeholder">
+		  <input type="text" name="gender_condition" class="form-control" id="formGroupExampleInput" placeholder="남/여/무관">
 		  <span class="input-group-text" id="basic-addon1">나이</span>
-		  <input type="text" name="age_condition" class="form-control" id="formGroupExampleInput" placeholder="Example input placeholder">
+		  <input type="text" name="age_condition" class="form-control" id="formGroupExampleInput" placeholder="O대/무관">
 		  <span class="input-group-text" id="basic-addon1">국적</span>
-		  <input type="text" name="nationality_condition" class="form-control" id="formGroupExampleInput" placeholder="Example input placeholder">
+		  <input type="text" name="nationality_condition" class="form-control" id="formGroupExampleInput">
 		</div>
 		
 		
 		<div class="mb-3">
 		  <label for="formGroupExampleInput2" class="form-label">사진 첨부</label>
-		  <input input type="file" name="image" class="form-control" id="formGroupExampleInput2" placeholder="Another input placeholder">
+		  <input input type="file" name="image" class="form-control" id="formGroupExampleInput2" required>
 		</div>
 		<div class="mb-3">
 			<label for="formGroupExampleInput" class="form-label">글쓰기</label>
 		<div class="input-group">
-			<textarea class="form-control" name="content_text" aria-label="With textarea" style="height: 300px;"></textarea>
+			<textarea class="form-control" name="content_text" aria-label="With textarea" style="height: 300px;" placeholder="본문 내용입니다." required></textarea>
 		</div>
 		</div>
 		
