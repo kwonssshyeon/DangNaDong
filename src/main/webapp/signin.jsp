@@ -48,7 +48,7 @@
         HttpSession s = request.getSession();
         s.setAttribute("member_id", member_id);
         //메인으로 바로 이동
-        response.sendRedirect("main.jsp");
+        response.sendRedirect("main.jsp?nation=KOR");
     } else {
 %>
        <div class="fail">

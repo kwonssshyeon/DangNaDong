@@ -13,9 +13,13 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="./css/itrPostList.css" />
+<link rel="stylesheet" href="./css/PostList.css" />
 
 <title>DND:일정소개글</title>
+
+<%
+	String nationParameter = request.getParameter("nation");
+%>
 
 <script>
    $(function(){
@@ -53,8 +57,9 @@
 <div class="container mt-5">
     <div class="row row-cols-md-3">
             <%
-            	String sql = "select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id from travel_introduction_post p, member m, itr_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = 'KOR'";
+            	String sql = "select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id from travel_introduction_post p, member m, itr_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id =?";
             	pstmt = conn.prepareStatement(sql);
+            	pstmt.setString(1, nationParameter);
             	rs = pstmt.executeQuery();
             	
             	while (rs.next()) {

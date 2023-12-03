@@ -34,7 +34,7 @@ public class chat extends HttpServlet {
 	   String member_id = request.getParameter("member_id");
 	   String location = request.getParameter("location");
 	   String content = request.getParameter("content");
-	   System.out.println(content);
+	   System.out.println(location);
         // Your Java function logic goes here
 	   
 	   String result = insertRealTimeChat(content,member_id,location, creationTime);

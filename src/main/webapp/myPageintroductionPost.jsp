@@ -64,7 +64,7 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                 <div class="card-body">
                   <h5 class="card-title"><%= rs.getString(1) %></h5>
                   <p class="card-text"><%= rs.getString(2) %></p>
-                  <a href="./myPageintroductionPosts.jsp?Post_id=<%=PostId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
+                  <a href="./myPageintroductionPosts.jsp?post_id=<%=PostId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
                 </div>
               </div>
             </div>

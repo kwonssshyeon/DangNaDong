@@ -16,6 +16,9 @@
 <link rel="stylesheet" href="./css/PostList.css" />
 
 <title>DND:동행신청글</title>
+<%
+	String nationParameter = request.getParameter("nation");
+%>
 
 <script>
    $(function(){
@@ -53,8 +56,9 @@
 <div class="container mt-5">
     <div class="row row-cols-md-3">
             <%
-            	String sql = "select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id, p.state, p.expected_cost from travel_companion_post p, member m, cpn_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = 'KOR'";
+            	String sql = "select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id, p.state, p.expected_cost from travel_companion_post p, member m, cpn_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = ?";
             	pstmt = conn.prepareStatement(sql);
+            	pstmt.setString(1, nationParameter);
             	rs = pstmt.executeQuery();
             	
             	while (rs.next()) {
