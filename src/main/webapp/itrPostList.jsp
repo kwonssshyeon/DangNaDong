@@ -35,6 +35,15 @@
 	String my_id = (String)s.getAttribute("member_id");
 %>
 <h4>일정을 소개하는 글</h4>
+
+<div class="sorting">
+	<form>
+		<select id="sorting" name="sorting">
+			<option value="popular">인기순</option>
+			<option value="recent">최신순</option>
+		</select>
+	</form>
+</div>
 <%
 	SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-M-d HH:mm:ss");
 	SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");

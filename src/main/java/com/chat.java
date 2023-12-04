@@ -60,10 +60,72 @@ public class chat extends HttpServlet {
 	      }
 
 	      // Make a connection
-	      try {
+	    try {
 	         conn = DriverManager.getConnection(URL, USER_UNIVERSITY, USER_PASSWD);
+	         
+            //수동으로 트랜잭션 관리
 	         conn.setAutoCommit(false);
 	         System.out.println("Connected.");
+	         
+	         
+	         
+	        //real_time_chat 에 lock 설정
+		      String lockQuery = "SELECT * FROM real_time_chat WHERE 1 = 0 FOR UPDATE";
+		      PreparedStatement pstmt = conn.prepareStatement(lockQuery);
+		      ResultSet rs = pstmt.executeQuery();
+		      
+		      //chat_id 가져오기
+		      String max_query="SELECT MAX(chat_id) FROM real_time_chat";
+			    try {
+			    	Statement stmt1 = conn.createStatement();
+				  	ResultSet max_rs = stmt1.executeQuery(max_query);
+				  	if(max_rs.next())
+				  		chat_id = max_rs.getInt(1);
+				  	chat_id = chat_id+1;
+				  	max_rs.close();
+				  	stmt1.close();
+			    }
+			    catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		      
+			 
+			  String insertReply = "insert into real_time_chat values (?, ?, ?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'), ?)";
+		      
+			  try{
+					PreparedStatement pstmt1 = conn.prepareStatement(insertReply);
+					pstmt1.setInt(1, chat_id);
+					pstmt1.setString(2, location);
+					pstmt1.setString(3, member_id);
+					pstmt1.setString(4, content);
+					pstmt1.setString(5, creationTime);
+					pstmt1.setString(6,"한국");
+					
+					pstmt1.executeUpdate();
+					response="successfully send";
+					
+					pstmt.close();
+									
+				}catch (SQLException e) {
+					System.out.print(e.getMessage());
+					response="failed to send";
+					
+					//예외 발생 시 rollback
+					try {
+		                if (conn != null) {
+		                	conn.rollback();
+		                }
+		            } catch (SQLException rollbackException) {
+		                rollbackException.printStackTrace();
+		            }
+		            e.printStackTrace();
+		            
+				}
+			  
+			  //lock 해제
+			  conn.commit();			  
+			  
 	      } catch (SQLException ex) {
 	         ex.printStackTrace();
 	         System.err.println("Cannot get a connection: " + ex.getLocalizedMessage());
@@ -71,47 +133,9 @@ public class chat extends HttpServlet {
 	         System.exit(1);
 	      }
 	      
-	      String max_query="SELECT MAX(chat_id) FROM real_time_chat";
-		    try {
-		    	Statement stmt1 = conn.createStatement();
-			  	ResultSet max_rs = stmt1.executeQuery(max_query);
-			  	if(max_rs.next())
-			  		chat_id = max_rs.getInt(1);
-			  	chat_id = chat_id+1;
-			  	max_rs.close();
-			  	stmt1.close();
-		    }
-		    catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	      
-	      String insertReply = "insert into real_time_chat values (?, ?, ?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'), ?)";
-	      
-		    try{
-				PreparedStatement pstmt = conn.prepareStatement(insertReply);
-				pstmt.setInt(1, chat_id);
-				pstmt.setString(2, location);
-				pstmt.setString(3, member_id);
-				pstmt.setString(4, content);
-				pstmt.setString(5, creationTime);
-				pstmt.setString(6,"한국");
-				
-				pstmt.executeUpdate();
-				response="successfully send";
-				pstmt.close();
-				} catch (SQLException e) {
-					System.out.print(e.getMessage());
-					response="failed to send";
-				}
-		    try {
-				conn.commit();
-			}catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		   
 		    
-		    return response;
+		  return response;
 		    
 	}
 }

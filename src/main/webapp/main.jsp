@@ -133,8 +133,9 @@ $("#sendBtn").on("click", function() {
         		
         success: function(response) {
             alert(response);
-            var url = 'main.jsp?nation=' + selectedNationId;
-            window.location = url;
+            //var url = 'main.jsp?nation=' + selectedNationId;
+            //window.location = url;
+            location.reload();
            
         },
         error: function(error) {
