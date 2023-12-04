@@ -168,10 +168,21 @@ $("#sendBtn").on("click", function() {
 	</div>
 <%
    // JSP 내에서 현재 요청의 파라미터 가져오기
-   String nation = request.getParameter("nation");
+   	String nation = request.getParameter("nation");
+	String natoin_name = "";
+	
+	String sql_nation_name = "select nation from location where location_id = ?";
+	pstmt = conn.prepareStatement(sql_nation_name);
+	pstmt.setString(1, nation);
+	//out.println(sql);
+	rs = pstmt.executeQuery();
+	
+	while(rs.next()){
+		natoin_name = rs.getString(1);
+	}
 %>
 	
-	<h2><%= nation %></h2>
+	<h2><%= natoin_name %></h2>
 	
 	<div class="write">
 		<form action="" name="post">
@@ -185,7 +196,7 @@ $("#sendBtn").on("click", function() {
 	
 </div>
 
-<img src="kor_main.jpg" alt="나라 별 사진 표시"><br>
+<img src="<%= nation %>.jpg" alt="나라 별 사진 표시"><br>
 
 
 <div class="btns">
