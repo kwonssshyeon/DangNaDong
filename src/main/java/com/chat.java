@@ -70,8 +70,9 @@ public class chat extends HttpServlet {
 	         
 	         
 	        //real_time_chat 에 lock 설정
-		      String lockQuery = "SELECT * FROM real_time_chat WHERE 1 = 0 FOR UPDATE";
+		      String lockQuery = "SELECT * FROM real_time_chat WHERE location_id = ? FOR UPDATE";
 		      PreparedStatement pstmt = conn.prepareStatement(lockQuery);
+		      pstmt.setString(1, location);
 		      ResultSet rs = pstmt.executeQuery();
 		      
 		      //chat_id 가져오기
