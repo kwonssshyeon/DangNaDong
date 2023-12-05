@@ -29,13 +29,14 @@ public class reply extends HttpServlet{
 	   public static String memberId = null;
 	   public static String location = null;
 
-	   public static int post_id = 1001;
-	   private int reply_id = 5000;
-	   String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	   public int post_id;
+	   public int reply_id = 0;
+	   String creationTime;
 	   
 	   public void doPost(HttpServletRequest request, HttpServletResponse response)
 	            throws ServletException, IOException {
 		   
+		   creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		   String member_id = request.getParameter("member_id");
 		   int post_id = Integer.parseInt(request.getParameter("post_id"));
 		   String content = request.getParameter("content");
@@ -106,7 +107,7 @@ public class reply extends HttpServlet{
 			pstmt.setString(5, creationTime);
 			
 			pstmt.executeUpdate();
-			System.out.print(pstmt);
+			
 			result="successfully submmited";
 			pstmt.close();
 			} catch (SQLException e) {

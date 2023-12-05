@@ -30,12 +30,14 @@ public class apply extends HttpServlet{
 	   public static String memberId = null;
 	   public static String location = null;
 	
-	   public int post_id = 1001;
-	   private int reply_id = 5000;
-	   String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	   public int post_id;
+	   public int reply_id;
+	   String creationTime;
 	   
 	   public void doPost(HttpServletRequest request, HttpServletResponse response)
 	            throws ServletException, IOException {
+		   
+		   creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		   String member_id = request.getParameter("member_id");
 		   int post_id = Integer.parseInt(request.getParameter("post_id"));
 	        // Your Java function logic goes here
@@ -48,7 +50,7 @@ public class apply extends HttpServlet{
 	   public String applyTravel(String member_id,int post_id) {
 		  Connection conn = null; // Connection object
 		  Statement stmt = null;    // Statement object
-		  Scanner scanner = new Scanner(System.in);
+		  
 		  String result;
 		
 		  if(member_id==null || member_id.isEmpty())
@@ -92,7 +94,6 @@ public class apply extends HttpServlet{
 			} catch (SQLException e) {
 				result = "You've already applied.";
 				System.out.println(e.getMessage());
-				System.out.print("이미 신청했습니다.");
 			}
 		  try {
 			conn.commit();

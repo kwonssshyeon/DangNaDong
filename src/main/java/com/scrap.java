@@ -74,7 +74,7 @@ public class scrap extends HttpServlet {
 				pstmt.close();
 				} catch (SQLException e) {
 					System.out.print(e.getMessage());
-					result="failed to submmit. you've already submitted.";
+					result="failed to submmit. you've already submitted or check if post exists";
 				}
 	      try {
 	    	  conn.commit();

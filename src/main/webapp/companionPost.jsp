@@ -3,14 +3,14 @@
 <%@ page language="java" import="java.lang.Integer" %>
 <%@ page language="java" import="java.time.LocalDateTime" %>
 <%@ page language="java" import="java.time.format.DateTimeFormatter" %>
-<%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
-<%@ page import="com.oreilly.servlet.MultipartRequest" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>여행 동행글 쓰기</title>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
 <script>
    $(function(){
@@ -20,108 +20,96 @@
 </script>
 </head>
 <body>
-<div id="navbar"></div>
-<% 
+<%!
+int post_id;
+String member_id="Mid1";
+String nation_code="KOR";
+String nation="";
+%>
+<%
 	String serverIP = "localhost";
 	String strSID = "orcl";
 	String portNum = "1521";
 	String user = "university";
 	String pass = "comp322";
 	String url = "jdbc:oracle:thin:@"+serverIP+":"+portNum+":"+strSID;
-
+	
 	Connection conn = null;
 	PreparedStatement pstmt;
 	ResultSet rs;
-	try {
-	    Class.forName("oracle.jdbc.driver.OracleDriver");
-	} catch (ClassNotFoundException e) {
-	    e.printStackTrace();
-	}
+	Class.forName("oracle.jdbc.driver.OracleDriver");
 	conn = DriverManager.getConnection(url,user,pass);
 	
-	
-%>
-<%!
-int post_id;
-String member_id="Mid1";
-String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-%>
-
-<%
-	String max_query="SELECT MAX(Post_id) FROM TRAVEL_COMPANION_POST";
+	String sql = "select nation from location where location_id='"+nation_code+"'";
 	Statement stmt = conn.createStatement();
-	ResultSet max_rs = stmt.executeQuery(max_query);
+	ResultSet max_rs = stmt.executeQuery(sql);
 	if(max_rs.next())
-		post_id = max_rs.getInt(1);
+		nation = max_rs.getString(1);
 	max_rs.close();
 	stmt.close();
+
 %>
-
-<h4>저장되었습니다.</h4>
-<%
-	conn.setAutoCommit(false);
-	String directory = "C:/SourceCode/2023_Database/DangNaDong/src/main/webapp/image/";
-	int maxSize = 1024*1024*100;
-	String encoding = "UTF-8";
 	
-	MultipartRequest multipartRequest = new MultipartRequest(request, directory, maxSize, encoding,
-			new DefaultFileRenamePolicy());
+<div id="navbar"></div>
+	<form action="companionPostResult.jsp" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
+		<div id="location" name="location"><%=nation %></div>
+		<div class="mb-3">
+		  <label for="formGroupExampleInput" class="form-label">제목</label>
+		  <input type="text" name="title" class="form-control" id="formGroupExampleInput" placeholder="제목을 입력하세요" required >
+		</div>
+		<div class="input-group mb-3">
+		  <span class="input-group-text" id="basic-addon1">여행날짜 선택</span>
+		  <input type="date" id="currentDate" name="travel_date" min="2023-01-01" max="2023-12-31" class="form-control">
+		  <span class="input-group-text" id="basic-addon1">여행기간</span>
+		  <input type="text" name="travel_period" class="form-control" id="formGroupExampleInput" placeholder="O박O일">
+		</div>
+		
+		  <div class="col-sm-5">
+			  <div class="input-group mb-3">
+			<span class="input-group-text" id="basic-addon1">모집마감일</span>
+		    <input type="date" name="deadline" min="2023-01-01" max="2023-12-31" class="form-control" required>
+		    </div>
+		    <div class="input-group mb-3">
+		  <span class="input-group-text" id="basic-addon1">예상비용</span>
+		  <input type="text" name="expected_cost" class="form-control" placeholder="O만원대">
+		</div>
+		  </div>
+		
+		모집인원
+		<div class="input-group mb-3">
+		  <span class="input-group-text" id="basic-addon1">인원수</span>
+		  <input type="number" name="number_of_recruited" class="form-control" id="formGroupExampleInput" required>
+		  <span class="input-group-text" id="basic-addon1">성별</span>
+		  <input type="text" name="gender_condition" class="form-control" id="formGroupExampleInput" placeholder="남/여/무관">
+		  <span class="input-group-text" id="basic-addon1">나이</span>
+		  <input type="text" name="age_condition" class="form-control" id="formGroupExampleInput" placeholder="O대/무관">
+		  <span class="input-group-text" id="basic-addon1">국적</span>
+		  <input type="text" name="nationality_condition" class="form-control" id="formGroupExampleInput">
+		</div>
+		
+		
+		<div class="mb-3">
+		  <label for="formGroupExampleInput2" class="form-label">사진 첨부</label>
+		  <input input type="file" name="image" class="form-control" id="formGroupExampleInput2" required>
+		</div>
+		<div class="mb-3">
+			<label for="formGroupExampleInput" class="form-label">글쓰기</label>
+		<div class="input-group">
+			<textarea class="form-control" name="content_text" aria-label="With textarea" style="height: 300px;" placeholder="본문 내용입니다." required></textarea>
+		</div>
+		</div>
+		
+		<br/>
+		
+
+		
+		
 	
-	String query = "INSERT INTO TRAVEL_COMPANION_POST (Post_id, Member_id, Creation_time, Title, Content_text, Travel_date, Travel_period, Expected_cost, State, Deadline, Gender_condition, Age_condition, Nationality_condition, Number_of_recruited) " +
-            "VALUES (?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'), ?, ?, TO_DATE(?, 'YYYY-MM-DD'), ?, ?, ?, TO_DATE(?, 'YYYY-MM-DD'), ?, ?, ?, ?)";
-
-
-	try{
-		pstmt = conn.prepareStatement(query);
-		post_id=post_id+1;
-		
-		//int number_of_recruited = Integer.parseInt(multipartRequest.getParameter("number_of_recruited"));
-		pstmt.setInt(1, post_id);
-		pstmt.setString(2, "Mid1");
-		pstmt.setString(3, creationTime);
-		pstmt.setString(4, multipartRequest.getParameter("title"));
-		pstmt.setString(5, multipartRequest.getParameter("content_text"));
-		pstmt.setString(6, multipartRequest.getParameter("travel_date"));
-		pstmt.setString(7, multipartRequest.getParameter("travel_period"));
-		pstmt.setString(8, multipartRequest.getParameter("expected_cost"));
-		pstmt.setString(9, "진행");
-		pstmt.setString(10, multipartRequest.getParameter("deadline"));
-		pstmt.setString(11, multipartRequest.getParameter("gender_condition"));
-		pstmt.setString(12, multipartRequest.getParameter("age_condition"));
-		pstmt.setString(13, multipartRequest.getParameter("nationality_condition"));
-		pstmt.setString(14, multipartRequest.getParameter("number_of_recruited"));
-
-
-		
-		pstmt.executeUpdate();
-		
-		conn.commit();
-		pstmt.close();
-	} catch (SQLException e) {
-        out.println(e.getMessage());
-    }
-	String image_url = multipartRequest.getOriginalFileName("image");
-	String image_name = multipartRequest.getFilesystemName("image");
-
-
-	String image_query = "INSERT INTO cpn_image " +
-	        "VALUES (?, ?, ?)";
-
-	try{
-		pstmt = conn.prepareStatement(image_query);
-		pstmt.setInt(1, post_id);
-		pstmt.setString(2, "./image/"+image_url);
-		//TODO: 문자열 크기 제한
-		pstmt.setString(3, image_name);
-		pstmt.executeUpdate();
-		
-		conn.commit();
-		pstmt.close();
-	} catch (SQLException e) {
-	    out.println(e.getMessage());
-	}
-	
-%>
+		<br/>
+		<br/>
+		<button type="reset" class="btn btn-primary">Reset</button>
+		<button type="submit" class="btn btn-primary">Submit</button>
+	</form>
 
 
 
