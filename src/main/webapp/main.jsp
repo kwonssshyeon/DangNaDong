@@ -6,7 +6,6 @@
 <%@ page import="com.oreilly.servlet.MultipartRequest" %>
 <%@ page import="com.chat" %> 
 <%@ page import="com.countries" %> 
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,62 +24,6 @@
 </head>
 <body>
 <div id="navbar"></div>
-
-<<<<<<< HEAD
-=======
-
-<div class="header">
-	<div class="location">
-		<form>
-			<select name="continent">
-				<option value="selection">대륙선택</option>
-				<option value="아시아">아시아</option>
-				<option value="유럽">유럽</option>
-				<option value="아프리카">아프리카</option>
-				<option value="북아메리카">북아메리카</option>
-				<option value="남아메리카">남아메리카</option>
-				<option value="오세아니아">오세아니아</option>
-			</select>
-			<select name="nation">
-				<option value="selection">나라선택</option>
-				<option value="KOR">한국</option>
-				<option value="JPN">일본</option>
-				<option value="CHN">중국</option>
-				<option value="QAT">카타르</option>
-				<option value="VNM">베트남</option>
-				<option value="SGP">싱가포르</option>
-			</select>
-		</form>
-	</div>
-	
-	<h2>한국</h2>
-	
-	<div class="write">
-		<form action="" name="post">
-			<select name="write" onchange="location=document.post.write.value">
-				<option>글쓰기</option>
-				<option value="companionPost.jsp">동행찾기 글쓰기</option>
-				<option value="introducePost.jsp">일정소개 글쓰기</option>
-			</select>
-		</form>
-	</div>
-	
-</div>
-
-<img src="kor_main.jpg" alt="나라 별 사진 표시"><br>
-
-
-<div class="btns">
-	<div class="btn">
-	    <button onclick="location.href='cpnPostList.jsp'">동행 찾기 글 보기</button>
-	 </div>
-	 <div class="btn">
-		<button onclick="location.href='itrPostList.jsp'">일정 소개 글 보기</button>
-	</div>
-</div>
-
-<div class="realTChat">
->>>>>>> 11a703050ce4052fbd8e3755ac452a2ebebcc9ff
 <% 
 	String serverIP = "localhost";
 	String strSID = "orcl";
@@ -88,7 +31,6 @@
 	String user = "university";
 	String pass = "comp322";
 	String url = "jdbc:oracle:thin:@"+serverIP+":"+portNum+":"+strSID;
-
 	Connection conn = null;
 	PreparedStatement pstmt;
 	ResultSet rs;
@@ -97,9 +39,8 @@
 %>
 
 <%
-HttpSession s = request.getSession();
-String member_id = (String)s.getAttribute("member_id");
-String location = "KOR";
+	HttpSession s = request.getSession();
+	String member_id = (String)s.getAttribute("member_id");
 %>
 
 <script type="text/javascript">
@@ -108,10 +49,8 @@ function updateCountries() {
     var nationSelect = document.getElementById("nation");
     var selectedContinent = continentSelect.value;
     var selectedNation = nationSelect.value;
-
     // 국가 옵션 초기화
     nationSelect.innerHTML = "<option value='selection'>나라선택</option>";
-
     // AJAX를 사용하여 서버에 대륙 정보를 전송하고 나라 목록을 받아옴
     $.ajax({
         type: "POST",
@@ -138,7 +77,6 @@ function addOption(selectElement, value, text) {
     selectElement.add(option);
 }
 
-
 function nationSelection() {
     // 나라를 선택했을 때 실행할 로직 추가
    	var selectedNationId = document.getElementById("nation").value;
@@ -148,7 +86,6 @@ function nationSelection() {
     
     var url = 'main.jsp?nation=' + selectedNationId;
     window.location = url;
-
 }
 
 function getParameterByName(name, url) {
@@ -164,19 +101,16 @@ function getParameterByName(name, url) {
 }
 
 var nationParameter = getParameterByName('nation');
-
 //console.log("Nation Parameter: ", nationParameter);
-
 var content
+
 function func() {
 content = document.getElementById("message").value;
 }
 
 $(document).ready(function() {
 var member_id = '<%= member_id %>';
-
 //console.log(selectedNation);
-
 $("#sendBtn").on("click", function() {
 	
     $.ajax({
@@ -202,9 +136,6 @@ $("#sendBtn").on("click", function() {
 });
     
 </script>
-
-
-
 <div class="header">
 	<div class="location">
 		<form>
@@ -223,7 +154,7 @@ $("#sendBtn").on("click", function() {
 		</form>
 	</div>
 <%
-   // JSP 내에서 현재 요청의 파라미터 가져오기
+   
    	String nation = request.getParameter("nation");
 	String natoin_name = "";
 	
@@ -244,12 +175,12 @@ $("#sendBtn").on("click", function() {
 		<form action="" name="post">
 			<select name="write" onchange="location=document.post.write.value">
 				<option>글쓰기</option>
-				<option value="companionPost.html?nation=<%=nation%>">동행찾기 글쓰기</option>
-				<option value="introducePost.html?nation=<%=nation%>">일정소개 글쓰기</option>
+				<option value="companionPost.jsp?nation=<%=nation%>">동행찾기 글쓰기</option>
+				<option value="introducePost.jsp?nation=<%=nation%>">일정소개 글쓰기</option>
 			</select>
 		</form>
 	</div>
-	
+
 </div>
 
 <img src="<%= nation %>.png" alt="나라 별 사진 표시"><br>
@@ -263,7 +194,6 @@ $("#sendBtn").on("click", function() {
 		<button onclick="location.href='itrPostList.jsp?nation=<%=nation%>'">일정 소개 글 보기</button>
 	</div>
 </div>
-
 <div class="realTChat">
   <section class="mb-5">
       <div class="card bg-light">
@@ -305,7 +235,6 @@ $("#sendBtn").on("click", function() {
 </div>
 	
 </div>
-
 <div id="footer"></div>
 </body>
 </html>

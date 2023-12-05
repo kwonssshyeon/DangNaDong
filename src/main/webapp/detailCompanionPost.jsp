@@ -45,9 +45,10 @@
 	
 	
 %>
-<%!
-int post_id=295;
-String my_id="Mid247";
+<%
+HttpSession s = request.getSession();
+String my_id = (String)s.getAttribute("member_id");
+int post_id = Integer.parseInt(request.getParameter("post_id"));
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 boolean isOwner=false;
 %>
