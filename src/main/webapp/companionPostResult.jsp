@@ -5,6 +5,8 @@
 <%@ page language="java" import="java.time.format.DateTimeFormatter" %>
 <%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
 <%@ page import="com.oreilly.servlet.MultipartRequest" %>
+<%@ page language="java" import="java.util.concurrent.locks.Lock" %>
+<%@ page language="java" import="java.util.concurrent.locks.ReentrantLock" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,7 +15,7 @@
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
+<link rel="stylesheet" href="./css/detailInroduce.css" />
 
 <script>
    $(function(){
@@ -41,8 +43,6 @@
 	    e.printStackTrace();
 	}
 	conn = DriverManager.getConnection(url,user,pass);
-	
-	
 %>
 <%!
 int post_id;
@@ -51,8 +51,21 @@ String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy
 String nation_code="KOR";
 boolean isOwner=false;
 %>
-
 <%
+String posted="";
+Cookie[] cookies = request.getCookies();
+if (cookies != null) {
+    for (Cookie cookie : cookies) {
+        if (cookie.getName().equals("posted")) {
+        	posted=cookie.getValue();
+        }
+    }
+}
+%>
+<%
+if(posted.equals("yes")){
+	Lock lock = new ReentrantLock();
+	lock.lock();
 	String max_query="SELECT MAX(Post_id) FROM TRAVEL_COMPANION_POST";
 	Statement stmt = conn.createStatement();
 	ResultSet max_rs = stmt.executeQuery(max_query);
@@ -63,6 +76,13 @@ boolean isOwner=false;
 %>
 <%
 	conn.setAutoCommit(false);
+	Savepoint savePoint = null;
+	try {
+		savePoint = conn.setSavepoint("savePoint");
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+	
 	String directory = "C:/SourceCode/2023_Database/DangNaDong/src/main/webapp/image/";
 	int maxSize = 1024*1024*100;
 	String encoding = "UTF-8";
@@ -78,7 +98,6 @@ boolean isOwner=false;
 		pstmt = conn.prepareStatement(query);
 		post_id=post_id+1;
 		
-		//int number_of_recruited = Integer.parseInt(multipartRequest.getParameter("number_of_recruited"));
 		pstmt.setInt(1, post_id);
 		pstmt.setString(2, "Mid1");
 		pstmt.setString(3, creationTime);
@@ -97,12 +116,16 @@ boolean isOwner=false;
 
 		
 		pstmt.executeUpdate();
-		
-		//conn.commit();
 		pstmt.close();
 	} catch (SQLException e) {
+		try {
+			conn.rollback(savePoint);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
         out.println(e.getMessage());
     }
+	
 	String image_url = multipartRequest.getOriginalFileName("image");
 	String image_name = multipartRequest.getFilesystemName("image");
 
@@ -118,9 +141,13 @@ boolean isOwner=false;
 		pstmt.setString(3, image_name);
 		pstmt.executeUpdate();
 		
-		//conn.commit();
 		pstmt.close();
 	} catch (SQLException e) {
+		try {
+			conn.rollback(savePoint);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 	    out.println(e.getMessage());
 	}
 	
@@ -134,8 +161,22 @@ boolean isOwner=false;
 		conn.commit();
 		pstmt.close();
 	} catch (SQLException e) {
+		try {
+			conn.rollback(savePoint);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 	    out.println(e.getMessage());
 	}
+	
+	lock.unlock();
+	
+	
+	Cookie cookie = new Cookie("posted", "no");
+    cookie.setMaxAge(60*60*60);
+    cookie.setPath("/");
+    response.addCookie(cookie);
+}
 %>
 
 
@@ -187,7 +228,7 @@ $(document).ready(function() {
 	
 	//동행글 정보 가져오기
 	String selectSql = "select * from TRAVEL_COMPANION_POST where post_id="+ post_id;
-	stmt = conn.createStatement();
+	Statement stmt = conn.createStatement();
 	try{
 		rs = stmt.executeQuery(selectSql);
 		while (rs.next()) {

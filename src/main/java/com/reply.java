@@ -11,6 +11,8 @@ import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,34 +42,31 @@ public class reply extends HttpServlet{
 		   String member_id = request.getParameter("member_id");
 		   int post_id = Integer.parseInt(request.getParameter("post_id"));
 		   String content = request.getParameter("content");
-	        // Your Java function logic goes here
+	      
+		   
 		   System.out.print(member_id+post_id+content);
 		   
 		   String result = insertReply(content,member_id,post_id);
 
-	        // Send a response (if needed)
 	       response.getWriter().write(result);
 	   }
 
 	   public String insertReply(String content,String member_id,int post_id) {
-	      Connection conn = null; // Connection object
-	      Statement stmt = null;    // Statement object
+	      Connection conn = null;
+	      Statement stmt = null;
 	      Scanner scanner = new Scanner(System.in);
 	      
 	      String result="";
 
 	      if(content==null || content.isEmpty())return "You can summit comment after writing";
 	      try {
-	         // Load a JDBC driver for Oracle DBMS
 	         Class.forName("oracle.jdbc.driver.OracleDriver");
-	         // Get a Connection object 
 	         System.out.println("Success!");
 	      } catch (ClassNotFoundException e) {
 	         System.err.println("error = " + e.getMessage());
 	         System.exit(1);
 	      }
 
-	      // Make a connection
 	      try {
 	         conn = DriverManager.getConnection(URL, USER_UNIVERSITY, USER_PASSWD);
 	         conn.setAutoCommit(false);
@@ -80,7 +79,14 @@ public class reply extends HttpServlet{
 	      }
 	      
 	      
-	      
+	    Lock lock = new ReentrantLock();
+	    lock.lock();
+	    Savepoint savePoint = null;
+	    try {
+			savePoint = conn.setSavepoint("savePoint");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	    String max_query="SELECT MAX(reply_id) FROM reply";
 	    try {
 	    	Statement stmt1 = conn.createStatement();
@@ -92,10 +98,14 @@ public class reply extends HttpServlet{
 		  	stmt1.close();
 	    }
 	    catch (SQLException e) {
-			// TODO Auto-generated catch block
+	    	try {
+				conn.rollback(savePoint);
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		}
-
+	    
 	    String insertReply = "INSERT INTO REPLY (reply_id, Member_id, Post_id, Content, Creation_time) VALUES (?, ?, ?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'))";
 	      
 	    try{
@@ -111,20 +121,29 @@ public class reply extends HttpServlet{
 			result="successfully submmited";
 			pstmt.close();
 			} catch (SQLException e) {
+				try {
+					conn.rollback(savePoint);
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
 				System.out.print(e.getMessage());
 				result="failed to submmit";
 			}
 	    try {
 			conn.commit();
 		}catch (SQLException e) {
-			// TODO Auto-generated catch block
+			try {
+				conn.rollback(savePoint);
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		}
 	    
+	    
+	    lock.unlock();
 	    return result;
-	     
-	      
-
+	    
 	}
 	   
 

@@ -4,6 +4,8 @@
 <%@ page language="java" import="java.time.format.DateTimeFormatter" %>
 <%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
 <%@ page import="com.oreilly.servlet.MultipartRequest" %>
+<%@ page language="java" import="java.util.concurrent.locks.Lock" %>
+<%@ page language="java" import="java.util.concurrent.locks.ReentrantLock" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -98,6 +100,21 @@ $(document).ready(function() {
 });
 </script>
 <%
+String posted="";
+Cookie[] cookies = request.getCookies();
+if (cookies != null) {
+    for (Cookie cookie : cookies) {
+        if (cookie.getName().equals("posted")) {
+        	posted=cookie.getValue();
+        }
+    }
+}
+%>
+<%
+if(posted.equals("yes")){
+	Lock lock = new ReentrantLock();
+	lock.lock();
+
 	String max_query="SELECT MAX(Post_id) FROM TRAVEL_INTRODUCTION_POST";
 	Statement stmt = conn.createStatement();
 	ResultSet max_rs = stmt.executeQuery(max_query);
@@ -109,6 +126,13 @@ $(document).ready(function() {
 
 <%
 	conn.setAutoCommit(false);
+	Savepoint savePoint = null;
+	try {
+		savePoint = conn.setSavepoint("savePoint");
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+
 	//String directory = application.getRealPath("/image/");
 	String directory = "C:/SourceCode/2023_Database/DangNaDong/src/main/webapp/image/";
 	
@@ -134,11 +158,16 @@ $(document).ready(function() {
 		pstmt.setString(8, multipartRequest.getParameter("cost"));
 		pstmt.executeUpdate();
 		
-		//conn.commit();
 		pstmt.close();
 	} catch (SQLException e) {
+		try {
+			conn.rollback(savePoint);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
         out.println(e.getMessage());
     }
+	
 	String image_url = multipartRequest.getOriginalFileName("image");
 	String image_name = multipartRequest.getFilesystemName("image");
 
@@ -154,9 +183,13 @@ $(document).ready(function() {
 		pstmt.setString(3, image_name);
 		pstmt.executeUpdate();
 		
-		//conn.commit();
 		pstmt.close();
 	} catch (SQLException e) {
+		try {
+			conn.rollback(savePoint);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 	    out.println(e.getMessage());
 	}
 	
@@ -171,10 +204,22 @@ $(document).ready(function() {
 		conn.commit();
 		pstmt.close();
 	} catch (SQLException e) {
+		try {
+			conn.rollback(savePoint);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 	    out.println(e.getMessage());
 	}
 	
+	lock.unlock();
 	
+	
+	Cookie cookie = new Cookie("posted", "no");
+    cookie.setMaxAge(60*60*60);
+    cookie.setPath("/");
+    response.addCookie(cookie);
+}
 %>
 <%
 	String member_id="";
@@ -186,7 +231,7 @@ $(document).ready(function() {
 	String cost="";
 		
 	String selectSql = "select * from TRAVEL_INTRODUCTION_POST where post_id="+ post_id;
-	stmt = conn.createStatement();
+	Statement stmt = conn.createStatement();
 	try{
 		rs = stmt.executeQuery(selectSql);
 		while (rs.next()) {
@@ -275,7 +320,7 @@ $(document).ready(function() {
             <div class="meta_info">
             <div class=info><img src="<%= profileImg%>" width="50" width="50"/><%=nickname %></div>
             <div class=info>스크랩 수: <%=scrap %>
-            	<button type="button" id="scrapButton" class="btn btn-primary" disabled>스크랩</button><br/>
+            	<button type="button" id="scrapButton" class="btn btn-primary">스크랩</button><br/>
             </div>
             </div>
             <div class="text-muted fst-italic mb-2">Posted on <%= creation_time %></div>
@@ -342,7 +387,7 @@ $(document).ready(function() {
 	
 	<div class="input-group mb-3">
   	<input type="text" id="replyText" class="form-control" placeholder="댓글을 입력하세요" onchange='func()'>
-  	<button type="button" id="replyBtn" class="btn btn-primary" disabled>등록</button>
+  	<button type="button" id="replyBtn" class="btn btn-primary">등록</button>
 	</div>
 
 

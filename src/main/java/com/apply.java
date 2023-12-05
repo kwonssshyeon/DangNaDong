@@ -40,10 +40,9 @@ public class apply extends HttpServlet{
 		   creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		   String member_id = request.getParameter("member_id");
 		   int post_id = Integer.parseInt(request.getParameter("post_id"));
-	        // Your Java function logic goes here
+		   
 		   String result = applyTravel(member_id,post_id);
 
-	        // Send a response (if needed)
 	        response.getWriter().write(result);
 	    }
 	
@@ -98,7 +97,6 @@ public class apply extends HttpServlet{
 		  try {
 			conn.commit();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		      

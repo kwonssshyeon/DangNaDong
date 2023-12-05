@@ -146,21 +146,6 @@ public class oneChat extends HttpServlet{
 			e.printStackTrace();
 		}
 
-//	      String insertReply = "INSERT INTO like_post (Post_id, Member_id) VALUES (?, ?)";
-//	      
-//	      try{
-//				PreparedStatement pstmt = conn.prepareStatement(insertReply);
-//				pstmt.setInt(1, post_id);
-//				pstmt.setString(2, member_id);
-//				
-//				pstmt.executeUpdate();
-//				System.out.print(pstmt);
-//				result="successfully submmited";
-//				pstmt.close();
-//				} catch (SQLException e) {
-//					System.out.print(e.getMessage());
-//					result="failed to submmit. you've already submitted.";
-//				}
 	      try {
 	    	  conn.commit();
 	      }catch (SQLException e) {

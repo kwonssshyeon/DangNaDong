@@ -3,6 +3,7 @@
 <%@ page language="java" import="java.lang.Integer" %>
 <%@ page language="java" import="java.time.LocalDateTime" %>
 <%@ page language="java" import="java.time.format.DateTimeFormatter" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,6 +19,29 @@
 	    $("#navbar").load("layout/navbar.html");
 	    $("#footer").load("layout/footer.html");
 	});
+   function setCookie(cName, cValue, cDay){
+	      var expire = new Date();
+	      expire.setDate(expire.getDate() + cDay);
+	      cookies = cName + '=' + escape(cValue) + '; path=/ ';
+	      if(typeof cDay != 'undefined') cookies += ';expires=' + expire.toGMTString() + ';';
+	      document.cookie = cookies;
+	}
+	function getCookie(cName) {
+	      cName = cName + '=';
+	      var cookieData = document.cookie;
+	      var start = cookieData.indexOf(cName);
+	      var cValue = '';
+	      if(start != -1){
+	        start += cName.length;
+	        var end = cookieData.indexOf(';', start);
+	        if(end == -1)end = cookieData.length;
+	        cValue = cookieData.substring(start, end);
+	      }
+	      return unescape(cValue);
+	}
+</script>
+<script>
+setCookie("posted", "yes", 1);
 </script>
 </head>
 <body>
