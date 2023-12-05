@@ -37,11 +37,12 @@
 	Class.forName("oracle.jdbc.driver.OracleDriver");
 	conn = DriverManager.getConnection(url,user,pass);
 %>
+
 <%
-HttpSession s = request.getSession();
-String member_id = (String)s.getAttribute("member_id");
-String location = "KOR";
+	HttpSession s = request.getSession();
+	String member_id = (String)s.getAttribute("member_id");
 %>
+
 <script type="text/javascript">
 function updateCountries() {
     var continentSelect = document.getElementById("continent");
@@ -68,12 +69,14 @@ function updateCountries() {
         }
     });
 }
+
 function addOption(selectElement, value, text) {
     var option = document.createElement("option");
     option.value = value;
     option.text = text;
     selectElement.add(option);
 }
+
 function nationSelection() {
     // 나라를 선택했을 때 실행할 로직 추가
    	var selectedNationId = document.getElementById("nation").value;
@@ -84,6 +87,7 @@ function nationSelection() {
     var url = 'main.jsp?nation=' + selectedNationId;
     window.location = url;
 }
+
 function getParameterByName(name, url) {
     if (!url) {
         url = window.location.href;
@@ -95,12 +99,15 @@ function getParameterByName(name, url) {
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+
 var nationParameter = getParameterByName('nation');
 //console.log("Nation Parameter: ", nationParameter);
 var content
+
 function func() {
 content = document.getElementById("message").value;
 }
+
 $(document).ready(function() {
 var member_id = '<%= member_id %>';
 //console.log(selectedNation);
@@ -147,7 +154,7 @@ $("#sendBtn").on("click", function() {
 		</form>
 	</div>
 <%
-   // JSP 내에서 현재 요청의 파라미터 가져오기
+   
    	String nation = request.getParameter("nation");
 	String natoin_name = "";
 	
@@ -168,8 +175,8 @@ $("#sendBtn").on("click", function() {
 		<form action="" name="post">
 			<select name="write" onchange="location=document.post.write.value">
 				<option>글쓰기</option>
-				<option value="companionPost.html?nation=<%=nation%>">동행찾기 글쓰기</option>
-				<option value="introducePost.html?nation=<%=nation%>">일정소개 글쓰기</option>
+				<option value="companionPost.jsp?nation=<%=nation%>">동행찾기 글쓰기</option>
+				<option value="introducePost.jsp?nation=<%=nation%>">일정소개 글쓰기</option>
 			</select>
 		</form>
 	</div>

@@ -20,10 +20,11 @@
 </script>
 </head>
 <body>
-<%!
+<%
 int post_id;
-String member_id="Mid1";
-String nation_code="KOR";
+HttpSession s = request.getSession();
+String my_id = (String)s.getAttribute("member_id");
+String nation_code=request.getParameter("nation");
 String nation="";
 %>
 <%
