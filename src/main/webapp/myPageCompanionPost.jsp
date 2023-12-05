@@ -16,6 +16,32 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
         $("#navbar").load("layout/navbar.html");
         $("#footer").load("layout/footer.html");
       });
+      
+      function deleteCompanionPost(postId) {
+    	  console.log(postId);
+          // 서버로 해당 게시글의 Post_id를 전송하여 삭제 요청
+          $.ajax({
+              type: "POST",
+              url: "<%=request.getContextPath()%>" + "/deletepost",
+              data: {post_id: postId},
+              success: function (response) {
+                  // 성공적으로 삭제되었을 때의 동작
+                  if (response === "Success") {
+                	  $("#deleteModal").modal("show");
+                	  location.reload(); 
+                      
+                  } else {
+                      // 삭제 실패 시에 대한 처리
+                      console.error("Delete failed:", response);
+                  }
+              },
+              error: function (error) {
+                  // 서버 통신 오류 시에 대한 처리
+                  console.error("Delete failed:", error);
+              }
+          });
+      }
+      
     </script>
 
   </head>
@@ -62,11 +88,12 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
             %>
             <div class="col mb-4">
               <div class="card" style="border: 1px solid #ffc300; border-radius: 5px; padding: 10px;">
-                <img src="..." class="card-img-top" alt="...">
                 <div class="card-body">
-                  <h5 class="card-title"><%= rs.getString(1) %></h5>
+                  <h5 class="card-title" style="font-weight: bold;"><%= rs.getString(1) %></h5>
                   <p class="card-text"><%= rs.getString(2) %></p>
-                  <a href="./myPageCompanionPost.jsp?Post_id=<%= PostId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
+                  <a href="./detailCompanionPost.jsp?post_id=<%= PostId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
+                  <a href="./companionPostEdit.jsp?post_id=<%= PostId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">수정</a>
+        <button onclick="deleteCompanionPost(<%=PostId %>);" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">삭제
                 </div>
               </div>
             </div>
@@ -99,6 +126,37 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
 
       <div id="footer"></div>
     </div>
+     <!-- "삭제" 모달 -->
+    <div class="modal" id="deleteModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">삭제 완료</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>삭제가 완료되었습니다.</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     
   </body>

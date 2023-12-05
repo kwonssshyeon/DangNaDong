@@ -80,7 +80,7 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                             <div class="col mb-4">
                                 <div class="card" style="border: 1px solid #ffc300; border-radius: 5px; padding: 10px;">
                                     <div class="card-body">
-                                        <h5 class="card-title" style="text-align:center;"><%= otherMemberNickname %> (<%= otherMemberId %>)</h5>
+                                        <h5 class="card-title" style="text-align:center;"><%= otherMemberNickname %></h5>
                                         <a href="./chat.jsp?chat_room_id=<%= chatRoomId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">1:1 메세지</a>
                                     </div>
                                 </div>

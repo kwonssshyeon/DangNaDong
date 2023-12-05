@@ -58,11 +58,10 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
             %>
             <div class="col mb-4">
               <div class="card" style="border: 1px solid #ffc300; border-radius: 5px; padding: 10px;">
-                <img src="..." class="card-img-top" alt="...">
                 <div class="card-body">
-                  <h5 class="card-title"><%= rs.getString(1) %></h5>
+                  <h5 class="card-title" style="font-weight: bold;"><%= rs.getString(1) %></h5>
                   <p class="card-text"><%= rs.getString(2) %></p>
-                  <a href="./myPageintroductionPosts.jsp?Post_id=<%=PostId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
+                  <a href="./detailIntroducePost.jsp?post_id=<%=PostId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
                 </div>
               </div>
             </div>

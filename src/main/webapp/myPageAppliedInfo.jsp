@@ -16,23 +16,36 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
         $("#footer").load("layout/footer.html");
     });
 
-    function acceptRequestState(userId) {
-        $('#acceptModal').modal('show');
-        handleState("수락");
-        setTimeout(function () {
-         	  window.location.href = "./myPageAppliedInfo.jsp";
-           },1500);
+    function acceptRequestState(userId, maxParticipants, acceptedApplications,Number_of_recruited,PostId) {
+        var member_id = userId;
+       
+        if (acceptedApplications < maxParticipants) {
+            $('#acceptModal').modal('show');
+            
+            handleState("수락", member_id,acceptedApplications,Number_of_recruited,PostId);
+            setTimeout(function () {
+            	 window.location.reload();
+            	
+            }, 1500);
+        } else {
+            // 정원 초과 모달 또는 다른 처리 추가
+            alert("정원이 초과되었습니다.");
+        }
+        window.location.reload();
     }
 
-    function rejectRequestState(userId) {
+
+    function rejectRequestState(userId, maxParticipants, acceptedApplications,Number_of_recruited,PostId) {
+    	var member_id=userId;
         $('#rejectModal').modal('show');
-        handleState("거절");
+        handleState("거절", member_id, acceptedApplications, Number_of_recruited, PostId);
         setTimeout(function () {
-         	  window.location.href = "./myPageAppliedInfo.jsp";
+        	 window.location.reload();
            },1500);
+        window.location.reload();
     }
 
-    function handleState(requestState) {
+    function handleState(requestState,member_id,acceptedApplications,Number_of_recruited,PostId) {
         var state = requestState;
         console.log('State:', state);
         console.log('Member ID:', member_id);
@@ -42,7 +55,10 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
             url: "<%=request.getContextPath()%>" + "/handleStateServlet",
             data: {
                 member_id: member_id, // 동행 요청을 한 멤버의 아이디
-                state: state
+                state: state,
+                acceptedApplications: acceptedApplications,
+                Number_of_recruited:Number_of_recruited,
+                PostId:PostId
             },
             success: function (response) {
                 // 서버에서의 처리가 성공했을 때의 동작
@@ -53,6 +69,7 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                 console.error("state Update failed:", error);
             }
         });
+        window.location.reload();
     }
 </script>
     
@@ -68,7 +85,7 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
       <div class="centerFrame">
         <div class="contentArea">
           <h3 style="margin-bottom: 30px;">동행 요청 현황</h3>
- <div class="row row-cols-1 row-cols-md-2" style="margin-left: 10px; margin-top: 10px;">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3" style="margin-left: 10px; margin-top: 10px;">
             <% 
               String serverIP = "localhost"; 
               String strSID = "orcl"; 
@@ -80,41 +97,81 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
               PreparedStatement pstmt; 
               ResultSet rs;
 
-              String currentMemberId = "Mid1"; // 실제로 로그인한 회원 ID로 대체하세요
+              HttpSession s = request.getSession();
+              String currentMemberId = (String)s.getAttribute("member_id");
+              //String currentMemberId = "Mid1"; // 실제로 로그인한 회원 ID로 대체하세요
               
               try {
                 Class.forName("oracle.jdbc.driver.OracleDriver"); 
                 conn = DriverManager.getConnection(url, user, pass); 
-                String query = "SELECT AP.Member_id, M.Nickname,TC.Title,AP.Request_state,TC.Post_id FROM TRAVEL_COMPANION_POST TC JOIN APPLICATION_INFO AP ON AP.Post_id = TC.Post_id JOIN MEMBER M ON M.Member_id = AP.Member_id WHERE TC.Member_id = ?";     
-				//M.Meber_id : 신청한 유저 아이디
+                String query = "SELECT AP.Member_id, M.Nickname,TC.Title,AP.Request_state,TC.Post_id,TC.State,TC.Number_of_recruited FROM TRAVEL_COMPANION_POST TC JOIN APPLICATION_INFO AP ON AP.Post_id = TC.Post_id JOIN MEMBER M ON M.Member_id = AP.Member_id WHERE TC.Member_id = ?";     
+				
+                // (그룹 바이 포스트 아이디,멤버 아이디)로 통일
+                //M.Meber_id : 신청한 유저 아이디
 				//Where Member_id : 로그인 유저
                 pstmt = conn.prepareStatement(query);
 				pstmt.setString(1,currentMemberId);
                 rs = pstmt.executeQuery(); 
+                int acceptedApplications=0;
+                String companionStatus = "";
                 
                 while (rs.next()) {
                 	String member_id = rs.getString(1);
                 	int PostId=rs.getInt(5);
+                	int maxParticipants = rs.getInt(7);
+                    String applyNumQuery = "SELECT COUNT(*) FROM APPLICATION_INFO WHERE REQUEST_STATE = '수락' AND POST_ID = ?";
+                    try (PreparedStatement applyNumStmt = conn.prepareStatement(applyNumQuery)) {
+                        applyNumStmt.setInt(1, PostId);
+                        try (ResultSet applyNumRs = applyNumStmt.executeQuery()) {
+                            if (applyNumRs.next()) {
+                                acceptedApplications = applyNumRs.getInt(1);
+                            }}}
             %>
             <script>
 			    var member_id = '<%= member_id %>';
+			    var maxParticipants ='<%= maxParticipants %>';
+			    var acceptedApplications= '<%= acceptedApplications %>';
 			</script>
             <div class="col mb-4">
               <div class="card" style="border: 1px solid #ffc300; border-radius: 5px; padding: 10px;">
-                <img src="..." class="card-img-top" alt="...">
                 <div class="card-body">
-                  <h5 class="card-title"><%= rs.getString(3) %></h5>
-                  <p class="card-text">신청하는 유저 아이디(테스트) : <%= rs.getString(1) %></p>
-                  <p class="card-text">신청하는 유저 아이디(테스트) : <%= rs.getString(2) %></p>
+                  <h5 class="card-title" style="font-weight: bold;"><%= rs.getString(3) %></h5>
+                  <p class="card-text">신청하는 유저 아이디 : <%= rs.getString(2) %></p>
                   <p class="card-text">현재 요청 상태 : <%= rs.getString(4) %></p>
-                  <a href="./myPageCompanionPost.jsp?Post_id=<%= PostId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
-                 <button type="button" class="btn btn-warning" onclick="acceptRequestState('<%= rs.getString(1) %>')" style="background-color: #ffc300; color: #ffffff;">수락</button>
-      			 <button type="button" class="btn btn-warning" onclick="rejectRequestState('<%= rs.getString(1) %>')" style="background-color: #ffc300; color: #ffffff;">거절</button>
-                
+                  
+                                    <% 
+                        String updateStatusQuery="";    
+                        if (acceptedApplications == rs.getInt(7)) {
+                            // 게시글 동행 상황이 "마감"인 경우 업데이트 수행
+                            updateStatusQuery = "UPDATE TRAVEL_COMPANION_POST SET STATE = '마감' WHERE POST_ID = ?";
+                        } else if (acceptedApplications < rs.getInt(7)) {
+                            // 수락된 인원수가 모집 인원보다 작으면 "진행"으로 표시
+                            updateStatusQuery = "UPDATE TRAVEL_COMPANION_POST SET STATE = '진행' WHERE POST_ID = ?";
+
+                        } try (PreparedStatement updateStatusStmt = conn.prepareStatement(updateStatusQuery)) {
+                            updateStatusStmt.setInt(1, PostId);
+                            updateStatusStmt.executeUpdate();
+                        }
+                        
+                        
+                    %>
+                   <p class="card-text">게시글 동행 상황 : <%= rs.getString(6) %></p>
+                  <p class="card-text">모집 인원 : <%= rs.getString(7) %></p>
+                  <p class="card-text">수락된 인원 수 : <%= acceptedApplications %></p>
+                  <a href="./detailCompanionPost.jsp?post_id=<%= PostId %>" class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
+            				<button type="button" class="btn btn-warning"
+                                onclick="acceptRequestState('<%= rs.getString(1) %>', <%= maxParticipants %>, <%= acceptedApplications %>,'<%= rs.getString(7) %>','<%= rs.getString(5) %>')"
+                                data-member-id="<%= rs.getString(1) %>"
+                                style="background-color: #ffc300; color: #ffffff;">수락</button>
+                            <button type="button" class="btn btn-warning"
+                                onclick="rejectRequestState('<%= rs.getString(1) %>', <%= maxParticipants %>, <%= acceptedApplications %>, '<%= rs.getString(7) %>', '<%= rs.getString(5) %>')"
+                                data-member-id="<%= rs.getString(1) %>"
+                                style="background-color: #ffc300; color: #ffffff;">거절</button>
         </div>
               </div>
             </div>
             <%
+            
                 } 
                 rs.close(); 
                 pstmt.close(); 

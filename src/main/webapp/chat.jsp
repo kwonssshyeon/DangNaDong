@@ -34,8 +34,12 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
         $("#navbar").load("layout/navbar.html");
         $("#footer").load("layout/footer.html");
     });
-
+    var sendingMessage = false;
     function sendMessage() {
+        if (sendingMessage) {
+            return;
+        }
+        sendingMessage = true;
     	var message = document.getElementById('messageInput').value;
 
         console.log('Member ID(sender):', member_id); 
@@ -71,6 +75,9 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                 console.error("sent failed:", error);
             }
         });
+        
+        // 서버로 메시지 전송 후에
+        sendingMessage = false;
     }
       
     </script>
@@ -109,20 +116,24 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                 Class.forName("oracle.jdbc.driver.OracleDriver"); 
                 conn = DriverManager.getConnection(url, user, pass); 
                 
+                conn.setAutoCommit(false); // 트랜잭션 시작
                 
                 String chatRoomId = request.getParameter("chat_room_id");
                 //String query = "select Chat_room_id,Member_id,Message from ONE_TO_ONE_CHAT where Member_id='Mid129'";  
                 
-                String query = "select Member_id,Message from ONE_TO_ONE_CHAT where chat_room_id=?";
+                String query = "SELECT ONE_TO_ONE_CHAT.Member_id, ONE_TO_ONE_CHAT.Message, MEMBER.Nickname FROM ONE_TO_ONE_CHAT JOIN MEMBER ON ONE_TO_ONE_CHAT.Member_id = MEMBER.Member_id WHERE ONE_TO_ONE_CHAT.Chat_room_id = ? FOR UPDATE";
+                
                 pstmt = conn.prepareStatement(query);
                 pstmt.setString(1, chatRoomId);
                 
                 rs = pstmt.executeQuery(); 
-                     
+                
+                conn.commit(); // 트랜잭션 커밋
                 while (rs.next()) {
                     String chat_room_id = chatRoomId;
-                    String member_id = rs.getString("Member_id");
-                    String message = rs.getString("Message");
+                    String member_id = rs.getString(1);
+                    String message = rs.getString(2);
+                    String nickname = rs.getString(3);
             %>
             <script>
 			    var member_id = '<%= member_id %>';
@@ -131,12 +142,12 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
 				    <div class="message-container">
 				        <% if (member_id.equals("Mid267")) { %>  
 						            <div class="message sent">
-		                <p><strong>보내는 사람:</strong> <%= member_id %></p>
+		                <p><strong>보내는 사람:</strong> <%= nickname %></p>
 		                <p><strong>메시지:</strong> <%= message %></p>
 		            </div>
 		        <% } else { %>
 		            <div class="message received">
-		                <p><strong>보내는 사람:</strong> <%= member_id %></p>
+		                <p><strong>보내는 사람:</strong> <%= nickname %></p>
 		                <p><strong>메시지:</strong> <%= message %></p>
 		            </div>
 		        <% } %>
@@ -148,6 +159,13 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                 pstmt.close(); 
                 conn.close(); 
               } catch (Exception e) {
+            	  if (conn != null) {
+            	        try {
+            	            conn.rollback(); // 트랜잭션 롤백
+            	        } catch (SQLException ex) {
+            	            ex.printStackTrace();
+            	        }
+            	    }
                 e.printStackTrace();
               }
             %>

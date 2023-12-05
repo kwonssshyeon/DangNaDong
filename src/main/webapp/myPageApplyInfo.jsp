@@ -41,28 +41,61 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
               PreparedStatement pstmt; 
               ResultSet rs;
               
-              String currentMemberId = "Mid77"; // 실제로 로그인한 회원 ID로 대체하세요
+              HttpSession s = request.getSession();
+              String currentMemberId = (String)s.getAttribute("member_id");
+				
+              //String currentMemberId = "Mid1"; // 실제로 로그인한 회원 ID로 대체하세요
 
-              
+              int acceptedApplications=0;
               try {
                 Class.forName("oracle.jdbc.driver.OracleDriver"); 
                 conn = DriverManager.getConnection(url, user, pass); 
-                String query = "SELECT AP.Member_id, TC.Title, AP.Request_state,AP.Post_id FROM TRAVEL_COMPANION_POST TC JOIN APPLICATION_INFO AP ON AP.Post_id = TC.Post_id WHERE AP.Member_id = ?"; 				
+                
+                
+                String query = "SELECT AP.Member_id, TC.Title, AP.Request_state,AP.Post_id,TC.State,TC.Number_of_recruited FROM TRAVEL_COMPANION_POST TC JOIN APPLICATION_INFO AP ON AP.Post_id = TC.Post_id WHERE AP.Member_id = ?"; 				
                 pstmt = conn.prepareStatement(query);
                 pstmt.setString(1,currentMemberId);
                 rs = pstmt.executeQuery(); 
                 
+            
                 while (rs.next()) {
-                	int PostId=rs.getInt(4);
-            %>
+                    int PostId = rs.getInt(4);
+
+                    String applyNumQuery = "SELECT COUNT(*) FROM APPLICATION_INFO WHERE REQUEST_STATE = '수락' AND POST_ID = ?";
+                    try (PreparedStatement applyNumStmt = conn.prepareStatement(applyNumQuery)) {
+                        applyNumStmt.setInt(1, PostId);
+                        try (ResultSet applyNumRs = applyNumStmt.executeQuery()) {
+                            if (applyNumRs.next()) {
+                                acceptedApplications = applyNumRs.getInt(1);
+                            }
+                        }
+                    }
+
+                    // 여기에 게시글 동행 상황 업데이트 코드 추가
+                    String updateStateQuery;
+                    if (acceptedApplications == rs.getInt(6)) {
+                        // 수락된 인원이 모집 인원과 같으면 "마감"으로 업데이트
+                        updateStateQuery = "UPDATE TRAVEL_COMPANION_POST SET STATE = '마감' WHERE POST_ID = ?";
+                    } else {
+                        // 수락된 인원이 모집 인원보다 작으면 "진행"으로 업데이트
+                        updateStateQuery = "UPDATE TRAVEL_COMPANION_POST SET STATE = '진행' WHERE POST_ID = ?";
+                    }
+
+                    try (PreparedStatement updateStateStmt = conn.prepareStatement(updateStateQuery)) {
+                        updateStateStmt.setInt(1, PostId);
+                        updateStateStmt.executeUpdate();
+                    }
+                %>
+
             <div class="col mb-4">
               <div class="card" style="border: 1px solid #ffc300; border-radius: 5px; padding: 10px;">
-                <img src="..." class="card-img-top" alt="...">
                 <div class="card-body">
-                  <h5 class="card-title"><%= rs.getString(2) %></h5>
-                  <p class="card-text">글을 보고 신청한 사람 아이디(테스트) : <%= rs.getString(1) %></p>
+                  <h5 class="card-title" style="font-weight: bold;"><%= rs.getString(2) %></h5>
                   <p class="card-text">현재 요청 상태 : <%= rs.getString(3) %></p>
-                  <a href="./myPageCompanionPost.jsp?Post_id=<%= PostId %>"class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
+                  <p class="card-text">게시글 동행 상황 : <%= rs.getString(5) %></p>
+                  <p class="card-text">모집 인원 : <%= rs.getString(6) %></p>
+                  <p class="card-text">수락된 인원 수 : <%= acceptedApplications %></p>
+                  <a href="./detailCompanionPost.jsp?post_id=<%= PostId %>"class="btn btn-primary" style="background-color: #ffc300; color: #ffffff;">작성 글로 이동</a>
                   
         </div>
               </div>

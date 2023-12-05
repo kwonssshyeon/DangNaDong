@@ -12,56 +12,68 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
 	
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="./js/myPage.js"></script>
+
 	<script>
-    
-	 function handleUpdateComplete() {
-         var nickname = document.getElementById("nickname").value;
-         var introduction = document.getElementById("introduction").value;
-         var email = document.getElementById("email").value;
-         var birthdate = document.getElementById("birthdate").value;
-         // 선택한 이미지 파일 가져오기
-         var selectedImageFile = document.getElementById("fileInput").files[0];
-         
-         // 데이터 중 null 값 체크
-         if (!nickname || !introduction || !email || !birthdate) {
-           // 입력값 중 null 값 존재함.
-           $("#invalidInfoModal").modal("show");
-           return;
-         }
-         
-         console.log("selectedImage : ",selectedImageFile);
-		 console.log("selectedImage : ",selectedImageFile.name);
-         
-         	//여기서 서버로 이동
-			$.ajax({
-			  type: "POST",
-			  url: "<%=request.getContextPath()%>" + "/UpdateMemberServlet" ,// 수정할 서블릿의 주소로 변경
-           data: {
-             member_id: "Mid1", // 수정 대상의 Member_id
-             nickname: nickname,
-             introduction: introduction,
-             email: email,
-             birthdate: birthdate,
-             profile_image:selectedImageFile.name
-           },
-           success: function (response) {
-             // 서버에서의 처리가 성공했을 때의 동작
-             showPopup('successPopup');
-             
-             setTimeout(function () {
-           	  window.location.href = "./myPage.jsp";
-             }, 2000); // 1000 밀리초 = 1초
-           },
-           error: function (error) {
-             // 서버에서의 처리가 실패했을 때의 동작
-             console.error("Update failed:", error);
-           }
-         });
-         showPopup('successPopup');  
-     }
+   $(function(){
+	    $("#navbar").load("layout/navbar.html");
+	    $("#footer").load("layout/footer.html");
+	});
+</script>
+	<script>
+	function handleUpdateComplete() {
+	    var nickname = document.getElementById("nickname").value;
+	    var introduction = document.getElementById("introduction").value;
+	    var email = document.getElementById("email").value;
+	    var birthdate = document.getElementById("birthdate").value;
+	    var selectedImageFile = document.getElementById("fileInput").files[0];
+
+	    if (!nickname || !introduction || !email || !birthdate) {
+	        $("#invalidInfoModal").modal("show");
+	        return;
+	    }
+
+	    var profileImageName = selectedImageFile ? selectedImageFile.name : null;
+
+	    // 여기서 서버로 이동
+	    $.ajax({
+	        type: "POST",
+	        url: "<%=request.getContextPath()%>" + "/UpdateMemberServlet",
+	        data: {
+	            member_id: "Mid1",
+	            nickname: nickname,
+	            introduction: introduction,
+	            email: email,
+	            birthdate: birthdate,
+	            profile_image: profileImageName
+	        },
+	        success: function (response) {
+	            if (response === "Success") {
+	                // 성공적으로 업데이트된 경우
+	                showPopup('successPopup');
+	                setTimeout(function () {
+	                    window.location.href = "./myPage.jsp";
+	                }, 1500);
+	            } else if (response === "DuplicateNicknameOrEmail") {
+	                // 중복된 닉네임 또는 이메일이 있는 경우
+	                $("#duplicateInfoModal").modal("show");
+	                setTimeout(function () {
+	                    window.location.href = "./myPage.jsp";
+	                }, 1500);
+	            } else {
+	                // 기타 오류 처리
+	                console.error("Update failed:", response);
+	            }
+	        },
+	        error: function (error) {
+	            // 서버에서의 처리가 실패했을 때의 동작
+	            console.error("Update failed:", error);
+	        }
+	    });
+	    // showPopup('successPopup'); // 주석 처리
+	}
+
 	</script>
    
-
   </head>
   <body>
     <div id="navbar"></div>
@@ -86,7 +98,10 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
               ResultSet rs = null; 
                         
               String profileImageSrc = ""; // 초기화
-
+              String nickname = null; // 변수 초기화
+              String intro = null;
+              String mail=null;
+              Date birthdate = null; // Date 타입 변수 선언
               try {
                 Class.forName("oracle.jdbc.driver.OracleDriver"); 
                 conn = DriverManager.getConnection(url, user, pass); 
@@ -96,34 +111,37 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
 				
                 //String currentMemberId = "Mid1"; // 실제로 로그인한 회원 ID로 대체하세요
 
-                String query = "select Profile_image from MEMBER where Member_id=?";
+                String query = "select Profile_image,Nickname,Self_introdution,E_mail,Birth from MEMBER where Member_id=?";
                 pstmt = conn.prepareStatement(query);
                 pstmt.setString(1, currentMemberId);
                 rs = pstmt.executeQuery();
-
                 while (rs.next()) {
                     String profileImagePath = rs.getString(1);
+                    nickname = rs.getString(2);
+                    intro = rs.getString(3);
+                    mail=rs.getString(4);
+                    birthdate=rs.getDate(5);
                 %>
-				 <script>
-		    // Wrap your code in a function
-		    function updateProfileImage() {
-		        var profileImagePath = '<%= profileImagePath %>';
-		        console.log("profileImagePath test: " + profileImagePath);
-		
-		        // profileImagePath가 null이면 label과 input을 보여줌
-		        if (profileImagePath === null) {
-		            document.getElementById("profileImage").style.display = "block";
-		        } else {
-		            // profileImagePath가 null이 아니면 이미지를 보여줌
-		            var selectedImage = document.getElementById("selectedImage");
-		            if (selectedImage) {
-		                selectedImage.src = profileImagePath;
-		                selectedImage.style.display = "block";
+                
+		<script>
+
+    function updateProfileImage() {
+        var profileImagePath = '<%= profileImagePath %>';
+        console.log("profileImagePath test: " + profileImagePath);
+
+        // profileImagePath가 null이면 label과 input을 보여줌
+        if (profileImagePath === null) {
+            document.getElementById("profileImage").style.display = "block";
+        } else {
+            // profileImagePath가 null이 아니면 이미지를 보여줌
+            var selectedImage = document.getElementById("selectedImage");
+            if (selectedImage) {
+                selectedImage.src = profileImagePath;
+                selectedImage.style.display = "block";
             }
         }
     }
 
-    // Call the function after the document has fully loaded
     document.addEventListener("DOMContentLoaded", updateProfileImage);
 </script>
 
@@ -141,24 +159,24 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                   }
               }
                 %>
-		<label class="imgBtu" for="fileInput" id="profileImage">프로필<img id="selectedImage" class="selected-image" src="" alt="Selected Image"></label>
+		<label class="imgBtu" for="fileInput" id="profileImage">프로필<img id="selectedImage" class="selected-image" src="" ></label>
 		<input type="file" id="fileInput" class="file-input" onchange="handleFileSelect(this)">
           </div>
          <div class="mb-3">
 		  <label for="formGroupExampleInput" class="form-label">닉네임</label>
-		  <input type="text" class="form-control" id="nickname" placeholder="닉네임을 입력해주세요.">
+		  <input type="text" class="form-control" id="nickname" placeholder="닉네임을 입력해주세요." value="<%= nickname %>">
 		</div>
 		<div class="mb-3">
 		  <label for="formGroupExampleInput2" class="form-label">소개글</label>
-		  <input type="text" class="form-control" id="introduction" placeholder="소개글을 입력해주세요.">
+		  <input type="text" class="form-control" id="introduction" placeholder="소개글을 입력해주세요." value="<%= intro %>">
 		</div>
 		<div class="mb-3">
 		  <label for="formGroupExampleInput" class="form-label">이메일을 입력해주세요</label>
-		  <input type="text" class="form-control" id="email" placeholder="이메일을 입력해주세요">
+		  <input type="text" class="form-control" id="email" placeholder="이메일을 입력해주세요" value="<%= mail %>">
 		</div>
 		<div class="mb-3">
 		  <label for="formGroupExampleInput2" class="form-label">생년월일</label>
-		  <input type="text" class="form-control" id="birthdate" placeholder="생년월일을 입력해주세요">
+		  <input type="text" class="form-control" id="birthdate" placeholder="생년월일을 입력해주세요" value="<%= birthdate %>">
 		</div>
         </div>
         <div class="menuArea">
@@ -220,7 +238,25 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
         </div>
       </div>
     </div>
-
+<!-- "중복된 닉네임 또는 이메일" 모달 -->
+<div class="modal" id="duplicateInfoModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">중복된 닉네임 또는 이메일</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>이미 다른 회원이 사용 중인 닉네임 또는 이메일입니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
   </body>
