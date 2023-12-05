@@ -138,20 +138,20 @@ $("#sendBtn").on("click", function() {
 </script>
 <div class="header">
 	<div class="location">
-		<form>
-			<select id="continent" name="continent" onchange="updateCountries()">
-				<option value='selection'>대륙선택</option>
-				<option value="아시아">아시아</option>
-				<option value="유럽">유럽</option>
-				<option value="아프리카">아프리카</option>
-				<option value="북아메리카">북아메리카</option>
-				<option value="남아메리카">남아메리카</option>
-				<option value="오세아니아">오세아니아</option>
-			</select>
-			<select id="nation" name="nation" onchange="nationSelection()">
-				<option value='selection'>나라선택</option>
-			</select>
-		</form>
+	    <form>
+	        <select id="continent" name="continent" onchange="updateCountries()">
+	            <option value='selection'>대륙선택</option>
+	            <option value="아시아" <%= ("아시아".equals(request.getParameter("continent"))) ? "selected" : "" %>>아시아</option>
+	            <option value="유럽" <%= ("유럽".equals(request.getParameter("continent"))) ? "selected" : "" %>>유럽</option>
+	            <option value="아프리카" <%= ("아프리카".equals(request.getParameter("continent"))) ? "selected" : "" %>>아프리카</option>
+	            <option value="북아메리카" <%= ("북아메리카".equals(request.getParameter("continent"))) ? "selected" : "" %>>북아메리카</option>
+	            <option value="남아메리카" <%= ("남아메리카".equals(request.getParameter("continent"))) ? "selected" : "" %>>남아메리카</option>
+	            <option value="오세아니아" <%= ("오세아니아".equals(request.getParameter("continent"))) ? "selected" : "" %>>오세아니아</option>
+	        </select>
+	        <select id="nation" name="nation" onchange="nationSelection()">
+	            <option value='selection'>나라선택</option>
+	        </select>
+	    </form>
 	</div>
 <%
    
