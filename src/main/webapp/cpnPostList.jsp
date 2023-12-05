@@ -16,9 +16,7 @@
 <link rel="stylesheet" href="./css/PostList.css" />
 
 <title>DND:동행신청글</title>
-<%
-	String nationParameter = request.getParameter("nation");
-%>
+
 
 <script>
    $(function(){
@@ -34,6 +32,31 @@
 	String my_id = (String)s.getAttribute("member_id");
 %>
 <h4>동행을 찾는 글</h4>
+
+<div class="sorting">
+    <form id="sortingForm">
+        <select id="sorting" name="sorting" onchange="submitForm()">
+        	<option value="sorting">정렬</option>
+            <option value="popular">인기순</option>
+            <option value="recent">최신순</option>
+        </select>
+    </form>
+</div>
+
+<script>
+    function submitForm() {
+    <%
+    	String nationParameter = request.getParameter("nation");
+    %>
+    
+        var selectedOption = document.getElementById("sorting").value;
+        var nationParameter = "<%= nationParameter %>"; // JSP에서 nation 매개변수 가져오기
+        var url = "cpnPostList.jsp?nation=" + nationParameter + "&sorting=" + selectedOption;
+        console.log(url);
+        window.location = url;
+    }
+</script>
+
 <%
 	SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-M-d HH:mm:ss");
 	SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -56,7 +79,21 @@
 <div class="container mt-5">
     <div class="row row-cols-md-3">
             <%
-            	String sql = "select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id, p.state, p.expected_cost from travel_companion_post p, member m, cpn_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = ?";
+            	String sortingOption = request.getParameter("sorting");
+            	String sql = "";
+            	
+	            if ("popular".equals(sortingOption)) {
+	                // 인기순 쿼리 실행(동행글 -> 좋아요 순))
+	                sql = "with posts as (select p.member_id, p.title, p.travel_period, p.creation_time, p.post_id, p.state, p.expected_cost from travel_companion_post p, cpn_contain l where p.post_id = l.post_id and l.location_id = ?) select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id, p.state, p.expected_cost, count(*) from posts p join member m on p.member_id = m.member_id left join like_post s on p.post_id = s.post_id group by p.title, p.travel_period, m.nickname, p.creation_time, p.post_id, p.state, p.expected_cost order by count(*) desc";
+	                // ...
+	            } else if ("recent".equals(sortingOption)) {
+	                // 최신순 쿼리 실행
+	            	sql = "select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id, p.state, p.expected_cost from travel_companion_post p, member m, cpn_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = ? order by p.creation_time desc";
+	            }
+	            else {
+	            	sql = "select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id, p.state, p.expected_cost from travel_companion_post p, member m, cpn_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = ?";
+	            }
+            	
             	pstmt = conn.prepareStatement(sql);
             	pstmt.setString(1, nationParameter);
             	rs = pstmt.executeQuery();

@@ -197,7 +197,7 @@ $("#sendBtn").on("click", function() {
 	
 </div>
 
-<img src="<%= nation %>.jpg" alt="나라 별 사진 표시"><br>
+<img src="<%= nation %>.png" alt="나라 별 사진 표시"><br>
 
 
 <div class="btns">
