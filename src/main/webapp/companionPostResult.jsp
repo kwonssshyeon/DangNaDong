@@ -1,31 +1,26 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page language="java" import="java.text.*,java.sql.*" %>
-<%@ page language="java" import="java.time.LocalDateTime,java.time.LocalDate" %>
+<%@ page language="java" import="java.lang.Integer" %>
+<%@ page language="java" import="java.time.LocalDateTime" %>
 <%@ page language="java" import="java.time.format.DateTimeFormatter" %>
 <%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
 <%@ page import="com.oreilly.servlet.MultipartRequest" %>
-
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>여행동행글 상세보기</title>
+<title>여행 동행글 쓰기</title>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-modal-js@2.0.1/dist/bootstrap-modal-js.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-modal-js@2.0.1/demoFiles/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="./css/detailCompanion.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+
 <script>
    $(function(){
 	    $("#navbar").load("layout/navbar.html");
 	    $("#footer").load("layout/footer.html");
 	});
 </script>
-
-
-
-
 </head>
 <body>
 <div id="navbar"></div>
@@ -40,52 +35,118 @@
 	Connection conn = null;
 	PreparedStatement pstmt;
 	ResultSet rs;
-	Class.forName("oracle.jdbc.driver.OracleDriver"); 
+	try {
+	    Class.forName("oracle.jdbc.driver.OracleDriver");
+	} catch (ClassNotFoundException e) {
+	    e.printStackTrace();
+	}
 	conn = DriverManager.getConnection(url,user,pass);
 	
 	
 %>
 <%!
-int post_id=295;
-String my_id="Mid247";
+int post_id;
+String member_id="Mid1";
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+String nation_code="KOR";
 boolean isOwner=false;
 %>
 
-<script type="text/javascript">	
-	var member_id = '<%= my_id %>';
-	var post_id = <%= post_id %>;
-	var apply = function(member_id,post_id) {			
-		location.href = "apply.jsp?member="+member_id+"&post="+post_id;
-	};	
-	var chatting = function() {			
-		location.href = "oneToOneChat.jsp?member="+member_id+"&post="+post_id;
-	};
-</script>
+<%
+	String max_query="SELECT MAX(Post_id) FROM TRAVEL_COMPANION_POST";
+	Statement stmt = conn.createStatement();
+	ResultSet max_rs = stmt.executeQuery(max_query);
+	if(max_rs.next())
+		post_id = max_rs.getInt(1);
+	max_rs.close();
+	stmt.close();
+%>
+<%
+	conn.setAutoCommit(false);
+	String directory = "C:/SourceCode/2023_Database/DangNaDong/src/main/webapp/image/";
+	int maxSize = 1024*1024*100;
+	String encoding = "UTF-8";
+	
+	MultipartRequest multipartRequest = new MultipartRequest(request, directory, maxSize, encoding,
+			new DefaultFileRenamePolicy());
+	
+	String query = "INSERT INTO TRAVEL_COMPANION_POST (Post_id, Member_id, Creation_time, Title, Content_text, Travel_date, Travel_period, Expected_cost, State, Deadline, Gender_condition, Age_condition, Nationality_condition, Number_of_recruited) " +
+            "VALUES (?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'), ?, ?, TO_DATE(?, 'YYYY-MM-DD'), ?, ?, ?, TO_DATE(?, 'YYYY-MM-DD'), ?, ?, ?, ?)";
+
+
+	try{
+		pstmt = conn.prepareStatement(query);
+		post_id=post_id+1;
+		
+		//int number_of_recruited = Integer.parseInt(multipartRequest.getParameter("number_of_recruited"));
+		pstmt.setInt(1, post_id);
+		pstmt.setString(2, "Mid1");
+		pstmt.setString(3, creationTime);
+		pstmt.setString(4, multipartRequest.getParameter("title"));
+		pstmt.setString(5, multipartRequest.getParameter("content_text"));
+		pstmt.setString(6, multipartRequest.getParameter("travel_date"));
+		pstmt.setString(7, multipartRequest.getParameter("travel_period"));
+		pstmt.setString(8, multipartRequest.getParameter("expected_cost"));
+		pstmt.setString(9, "진행");
+		pstmt.setString(10, multipartRequest.getParameter("deadline"));
+		pstmt.setString(11, multipartRequest.getParameter("gender_condition"));
+		pstmt.setString(12, multipartRequest.getParameter("age_condition"));
+		pstmt.setString(13, multipartRequest.getParameter("nationality_condition"));
+		pstmt.setString(14, multipartRequest.getParameter("number_of_recruited"));
+
+
+		
+		pstmt.executeUpdate();
+		
+		//conn.commit();
+		pstmt.close();
+	} catch (SQLException e) {
+        out.println(e.getMessage());
+    }
+	String image_url = multipartRequest.getOriginalFileName("image");
+	String image_name = multipartRequest.getFilesystemName("image");
+
+
+	String image_query = "INSERT INTO cpn_image " +
+	        "VALUES (?, ?, ?)";
+
+	try{
+		pstmt = conn.prepareStatement(image_query);
+		pstmt.setInt(1, post_id);
+		pstmt.setString(2, "./image/"+image_url);
+		//TODO: 문자열 크기 제한
+		pstmt.setString(3, image_name);
+		pstmt.executeUpdate();
+		
+		//conn.commit();
+		pstmt.close();
+	} catch (SQLException e) {
+	    out.println(e.getMessage());
+	}
+	
+	String locSql="insert into cpn_contain values(?,?)";
+	try{
+		pstmt = conn.prepareStatement(locSql);
+		pstmt.setInt(1, post_id);
+		pstmt.setString(2, nation_code);
+		
+		pstmt.executeUpdate();
+		conn.commit();
+		pstmt.close();
+	} catch (SQLException e) {
+	    out.println(e.getMessage());
+	}
+%>
+
+
+
+
+
 
 <script>
+
 $(document).ready(function() {
-    var member_id = '<%= my_id %>';
-    var post_id = <%= post_id %>;
-    
-    $("#applyButton").on("click", function() {
-        $.ajax({
-            type: "POST",
-            url: "applicate",
-            data:{"member_id":member_id,
-            		"post_id":post_id},
-            success: function(response) {
-                alert(response);
-                location.reload();
-            },
-            error: function(error) {
-                alert(error);
-            }
-        });
-    });
-});
-$(document).ready(function() {
-    var member_id = '<%= my_id %>';
+    var member_id = '<%= member_id %>';
     var post_id = <%= post_id %>;
     
     $("#likeButton").on("click", function() {
@@ -126,7 +187,7 @@ $(document).ready(function() {
 	
 	//동행글 정보 가져오기
 	String selectSql = "select * from TRAVEL_COMPANION_POST where post_id="+ post_id;
-	Statement stmt = conn.createStatement();
+	stmt = conn.createStatement();
 	try{
 		rs = stmt.executeQuery(selectSql);
 		while (rs.next()) {
@@ -204,11 +265,7 @@ $(document).ready(function() {
         out.println(e.getMessage());
     }
 	
-	if(my_id.equals(member_id))isOwner=true;
-	%>
 	
-	
-	<%
 	//신청현황 정보 가져오기
 	String applyNum = "select count(*) from application_info where request_state='수락' and post_id="+post_id;
 	int aNum=0;
@@ -274,24 +331,16 @@ $(document).ready(function() {
 	            <div class="card mb-4">
 	            <div class="d-grid gap-2">
 	            <!-- 본인 글에는 신청/채팅할 수 없도록 -->
-	            <% if (isOwner==false){
-	            	out.print("<input type='button' class='btn btn-primary' value='채팅하기' onClick='chatting()' />");
-	            }
-	            else{
-	            	out.print("<input type='button' class='btn btn-primary' disabled value='채팅하기' onClick='chatting('"+my_id+"',"+post_id+")'/>");
-	            }
+	            <% 
+	            	out.print("<input type='button' class='btn btn-primary' disabled value='채팅하기'/>");
 	            %>
 	            	
 	            </div>
 	            </div>
 	            <div class="card mb-4">
 	            	<div class="d-grid gap-2">
-	            	<% if (isOwner==false){
-		            	out.print("<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#exampleModal'>신청하기</button>");
-		            }
-		            else{
-		            	out.print("<button type='button' class='btn btn-primary' disabled data-bs-toggle='modal' data-bs-target='#exampleModal'>신청하기</button>");
-		            }
+	            	<%
+		            out.print("<button type='button' class='btn btn-primary' disabled data-bs-toggle='modal' data-bs-target='#exampleModal'>신청하기</button>");
 		            %>
 					</div>
 	            </div>
@@ -349,12 +398,6 @@ $(document).ready(function() {
 	  </div>
 	</div>
 
-	
-
-
-
 <div id="footer"></div>
-</div>
-
 </body>
 </html>

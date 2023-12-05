@@ -26,6 +26,61 @@
 <body>
 <div id="navbar"></div>
 
+<<<<<<< HEAD
+=======
+
+<div class="header">
+	<div class="location">
+		<form>
+			<select name="continent">
+				<option value="selection">대륙선택</option>
+				<option value="아시아">아시아</option>
+				<option value="유럽">유럽</option>
+				<option value="아프리카">아프리카</option>
+				<option value="북아메리카">북아메리카</option>
+				<option value="남아메리카">남아메리카</option>
+				<option value="오세아니아">오세아니아</option>
+			</select>
+			<select name="nation">
+				<option value="selection">나라선택</option>
+				<option value="KOR">한국</option>
+				<option value="JPN">일본</option>
+				<option value="CHN">중국</option>
+				<option value="QAT">카타르</option>
+				<option value="VNM">베트남</option>
+				<option value="SGP">싱가포르</option>
+			</select>
+		</form>
+	</div>
+	
+	<h2>한국</h2>
+	
+	<div class="write">
+		<form action="" name="post">
+			<select name="write" onchange="location=document.post.write.value">
+				<option>글쓰기</option>
+				<option value="companionPost.jsp">동행찾기 글쓰기</option>
+				<option value="introducePost.jsp">일정소개 글쓰기</option>
+			</select>
+		</form>
+	</div>
+	
+</div>
+
+<img src="kor_main.jpg" alt="나라 별 사진 표시"><br>
+
+
+<div class="btns">
+	<div class="btn">
+	    <button onclick="location.href='cpnPostList.jsp'">동행 찾기 글 보기</button>
+	 </div>
+	 <div class="btn">
+		<button onclick="location.href='itrPostList.jsp'">일정 소개 글 보기</button>
+	</div>
+</div>
+
+<div class="realTChat">
+>>>>>>> 11a703050ce4052fbd8e3755ac452a2ebebcc9ff
 <% 
 	String serverIP = "localhost";
 	String strSID = "orcl";
@@ -197,7 +252,7 @@ $("#sendBtn").on("click", function() {
 	
 </div>
 
-<img src="<%= nation %>.png" alt="나라 별 사진 표시"><br>
+<img src="kor_main.jpg" alt="나라 별 사진 표시"><br>
 
 
 <div class="btns">

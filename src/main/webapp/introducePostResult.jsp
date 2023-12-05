@@ -1,19 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page language="java" import="java.text.*,java.sql.*" %>
-<%@ page language="java" import="java.time.LocalDateTime,java.time.LocalDate" %>
+<%@ page language="java" import="java.time.LocalDateTime" %>
 <%@ page language="java" import="java.time.format.DateTimeFormatter" %>
 <%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
 <%@ page import="com.oreilly.servlet.MultipartRequest" %>
-<%@ page import="com.reply" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>일정소개글 상세보기</title>
+<title>일정소개글 쓰기</title>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="./css/detailInroduce.css" />
+
 <script>
    $(function(){
 	    $("#navbar").load("layout/navbar.html");
@@ -23,8 +22,6 @@
 
 </head>
 <body>
-
-
 <div id="navbar"></div>
 <% 
 	String serverIP = "localhost";
@@ -39,16 +36,15 @@
 	ResultSet rs;
 	Class.forName("oracle.jdbc.driver.OracleDriver");
 	conn = DriverManager.getConnection(url,user,pass);
+	
+	
 %>
-
-
-<%
-HttpSession s = request.getSession();
-int post_id = Integer.parseInt(request.getParameter("post_id"));
-int reply_id;
-//String member_id="Mid1";
-String my_id = (String)s.getAttribute("member_id");
+<%!
+int post_id;
+String member_id="Mid1";
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+String nation_code="KOR";
+String nation="";
 %>
 <script type="text/javascript">
 var content
@@ -57,7 +53,7 @@ var content
 	}
 
 $(document).ready(function() {
-    var member_id = '<%= my_id %>';
+    var member_id = '<%= member_id %>';
     var post_id = <%= post_id %>;
     
     $("#replyBtn").on("click", function() {
@@ -80,7 +76,7 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    var member_id = '<%= my_id %>';
+    var member_id = '<%= member_id %>';
     var post_id = <%= post_id %>;
     
     $("#scrapButton").on("click", function() {
@@ -102,14 +98,84 @@ $(document).ready(function() {
 });
 </script>
 <%
-	String max_query="SELECT MAX(reply_id) FROM REPLY";
+	String max_query="SELECT MAX(Post_id) FROM TRAVEL_INTRODUCTION_POST";
 	Statement stmt = conn.createStatement();
 	ResultSet max_rs = stmt.executeQuery(max_query);
 	if(max_rs.next())
-		reply_id = max_rs.getInt(1);
+		post_id = max_rs.getInt(1);
 	max_rs.close();
+	stmt.close();
 %>
 
+<%
+	conn.setAutoCommit(false);
+	//String directory = application.getRealPath("/image/");
+	String directory = "C:/SourceCode/2023_Database/DangNaDong/src/main/webapp/image/";
+	
+	int maxSize = 1024*1024*100;
+	String encoding = "UTF-8";
+	
+	MultipartRequest multipartRequest = new MultipartRequest(request, directory, maxSize, encoding,
+			new DefaultFileRenamePolicy());
+	
+	String query = "INSERT INTO TRAVEL_INTRODUCTION_POST (Post_id, Member_id, Creation_time, Title, Content_text, Travel_date, Travel_period, Cost) " +
+        "VALUES (?, ?, TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'), ?, ?, TO_DATE(?, 'YYYY-MM-DD'), ?, ?)";
+
+	try{
+		pstmt = conn.prepareStatement(query);
+		post_id=post_id+1;
+		pstmt.setInt(1, post_id);
+		pstmt.setString(2, "Mid1");
+		pstmt.setString(3, creationTime);
+		pstmt.setString(4, multipartRequest.getParameter("title"));
+		pstmt.setString(5, multipartRequest.getParameter("content_text"));
+		pstmt.setString(6, multipartRequest.getParameter("travel_date"));
+		pstmt.setString(7, multipartRequest.getParameter("travel_period"));
+		pstmt.setString(8, multipartRequest.getParameter("cost"));
+		pstmt.executeUpdate();
+		
+		//conn.commit();
+		pstmt.close();
+	} catch (SQLException e) {
+        out.println(e.getMessage());
+    }
+	String image_url = multipartRequest.getOriginalFileName("image");
+	String image_name = multipartRequest.getFilesystemName("image");
+
+
+	String image_query = "INSERT INTO itr_image " +
+	        "VALUES (?, ?, ?)";
+
+	try{
+		pstmt = conn.prepareStatement(image_query);
+		pstmt.setInt(1, post_id);
+		pstmt.setString(2, "./image/"+image_url);
+		//TODO: 문자열 크기 제한
+		pstmt.setString(3, image_name);
+		pstmt.executeUpdate();
+		
+		//conn.commit();
+		pstmt.close();
+	} catch (SQLException e) {
+	    out.println(e.getMessage());
+	}
+	
+	
+	String locSql="insert into itr_contain values(?,?)";
+	try{
+		pstmt = conn.prepareStatement(locSql);
+		pstmt.setInt(1, post_id);
+		pstmt.setString(2, nation_code);
+		
+		pstmt.executeUpdate();
+		conn.commit();
+		pstmt.close();
+	} catch (SQLException e) {
+	    out.println(e.getMessage());
+	}
+	
+	
+%>
 <%
 	String member_id="";
 	String creation_time="";
@@ -120,7 +186,7 @@ $(document).ready(function() {
 	String cost="";
 		
 	String selectSql = "select * from TRAVEL_INTRODUCTION_POST where post_id="+ post_id;
-	//Statement stmt = conn.createStatement();
+	stmt = conn.createStatement();
 	try{
 		rs = stmt.executeQuery(selectSql);
 		while (rs.next()) {
@@ -209,7 +275,7 @@ $(document).ready(function() {
             <div class="meta_info">
             <div class=info><img src="<%= profileImg%>" width="50" width="50"/><%=nickname %></div>
             <div class=info>스크랩 수: <%=scrap %>
-            	<button type="button" id="scrapButton" class="btn btn-primary">스크랩</button><br/>
+            	<button type="button" id="scrapButton" class="btn btn-primary" disabled>스크랩</button><br/>
             </div>
             </div>
             <div class="text-muted fst-italic mb-2">Posted on <%= creation_time %></div>
@@ -276,10 +342,11 @@ $(document).ready(function() {
 	
 	<div class="input-group mb-3">
   	<input type="text" id="replyText" class="form-control" placeholder="댓글을 입력하세요" onchange='func()'>
-  	<button type="button" id="replyBtn" class="btn btn-primary">등록</button>
+  	<button type="button" id="replyBtn" class="btn btn-primary" disabled>등록</button>
 	</div>
 
-	
+
+
 
 
 
