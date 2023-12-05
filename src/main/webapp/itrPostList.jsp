@@ -13,9 +13,11 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="./css/itrPostList.css" />
+<link rel="stylesheet" href="./css/PostList.css" />
 
 <title>DND:일정소개글</title>
+
+
 
 <script>
    $(function(){
@@ -31,6 +33,31 @@
 	String my_id = (String)s.getAttribute("member_id");
 %>
 <h4>일정을 소개하는 글</h4>
+
+<div class="sorting">
+    <form id="sortingForm">
+        <select id="sorting" name="sorting" onchange="submitForm()">
+        	<option value="sorting">정렬</option>
+            <option value="popular">인기순</option>
+            <option value="recent">최신순</option>
+        </select>
+    </form>
+</div>
+
+<script>
+    function submitForm() {
+    <%
+    	String nationParameter = request.getParameter("nation");
+    %>
+    
+        var selectedOption = document.getElementById("sorting").value;
+        var nationParameter = "<%= nationParameter %>"; // JSP에서 nation 매개변수 가져오기
+        var url = "itrPostList.jsp?nation=" + nationParameter + "&sorting=" + selectedOption;
+        console.log(url);
+        window.location = url;
+    }
+</script>
+
 <%
 	SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-M-d HH:mm:ss");
 	SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -53,8 +80,23 @@
 <div class="container mt-5">
     <div class="row row-cols-md-3">
             <%
-            	String sql = "select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id from travel_introduction_post p, member m, itr_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = 'KOR'";
-            	pstmt = conn.prepareStatement(sql);
+	            String sortingOption = request.getParameter("sorting");
+            	String sql = "";
+	
+	            if ("popular".equals(sortingOption)) {
+	                // 인기순 쿼리 실행(일정글 -> 스크랩 순))
+	                sql = "with posts as (select p.title, p.post_id, p.member_id, p.travel_period, p.creation_time from travel_introduction_post p, itr_contain l where p.post_id = l.post_id and l.location_id = ?) select p.title, p.travel_period, m.nickname, p.creation_time, count(*) from posts p join member m on p.member_id = m.member_id left join scrap s on p.post_id = s.post_id group by p.title, p.travel_period, m.nickname, p.creation_time order by count(*) desc";
+	                // ...
+	            } else if ("recent".equals(sortingOption)) {
+	                // 최신순 쿼리 실행
+	                sql = "select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id from travel_introduction_post p, member m, itr_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id = ? order by p.creation_time desc";
+	            }
+	            else {
+		            sql = "select p.title, p.travel_period, m.nickname, p.creation_time, p.post_id from travel_introduction_post p, member m, itr_contain l where p.member_id = m.member_id and p.post_id = l.post_id and l.location_id =?";            	
+	            }
+	            
+	            pstmt = conn.prepareStatement(sql);
+            	pstmt.setString(1,nationParameter);
             	rs = pstmt.executeQuery();
             	
             	while (rs.next()) {
