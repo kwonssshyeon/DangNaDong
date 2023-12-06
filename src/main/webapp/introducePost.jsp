@@ -50,6 +50,7 @@ int post_id;
 HttpSession s = request.getSession();
 String my_id = (String)s.getAttribute("member_id");
 String nation_code=request.getParameter("nation");
+s.setAttribute("nation", nation_code);
 String nation="";
 %>
 <%

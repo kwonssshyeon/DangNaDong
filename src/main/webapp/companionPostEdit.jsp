@@ -79,10 +79,10 @@ String nation="";
 	     rs = pstmt.executeQuery(); 
 	     
 	     while (rs.next()) {
-             title = rs.getString("Title");
+             title = rs.getString(1);
 
              // Travel_date를 java.sql.Date로 받아오기
-             java.sql.Date travelDateSql = rs.getDate("Travel_date");
+             java.sql.Date travelDateSql = rs.getDate(2);
 
              // java.sql.Date를 java.util.Date로 변환 (생략 가능)
              Date travelDateUtil = new Date(travelDateSql.getTime());
@@ -91,19 +91,19 @@ String nation="";
              SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
              travelDateStr = dateFormat.format(travelDateUtil);
 
-             travelPeriod = rs.getString("Travel_period");
+             travelPeriod = rs.getString(3);
              
              // Deadline을 문자열로 변환
-             java.sql.Date deadlineSql = rs.getDate("Deadline");
+             java.sql.Date deadlineSql = rs.getDate(4);
              Date deadlineUtil = new Date(deadlineSql.getTime());
              deadlineStr = dateFormat.format(deadlineUtil);
 
-             expectedCost = rs.getString("Expected_cost");
-             numberOfRecruited = rs.getInt("Number_of_recruited");
-             genderCondition = rs.getString("Gender_condition");
-             ageCondition = rs.getString("Age_condition");
-             nationalityCondition = rs.getString("Nationality_condition");
-             contentText = rs.getString("Content_text");
+             expectedCost = rs.getString(5);
+             numberOfRecruited = rs.getInt(6);
+             genderCondition = rs.getString(7);
+             ageCondition = rs.getString(8);
+             nationalityCondition = rs.getString(9);
+             contentText = rs.getString(10);
 	     };
 	
 

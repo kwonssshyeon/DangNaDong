@@ -41,11 +41,12 @@
 	
 	
 %>
-<%!
-int post_id;
-String member_id="Mid1";
+<%
+int post_id=0;
+HttpSession s = request.getSession();
+String my_id = (String)s.getAttribute("member_id");
+String nation_code = (String)s.getAttribute("nation");
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-String nation_code="KOR";
 String nation="";
 %>
 <script type="text/javascript">
@@ -55,7 +56,7 @@ var content
 	}
 
 $(document).ready(function() {
-    var member_id = '<%= member_id %>';
+    var member_id = '<%= my_id %>';
     var post_id = <%= post_id %>;
     
     $("#replyBtn").on("click", function() {
@@ -78,7 +79,7 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    var member_id = '<%= member_id %>';
+    var member_id = '<%= my_id %>';
     var post_id = <%= post_id %>;
     
     $("#scrapButton").on("click", function() {
@@ -149,7 +150,7 @@ if(posted.equals("yes")){
 		pstmt = conn.prepareStatement(query);
 		post_id=post_id+1;
 		pstmt.setInt(1, post_id);
-		pstmt.setString(2, "Mid1");
+		pstmt.setString(2, my_id);
 		pstmt.setString(3, creationTime);
 		pstmt.setString(4, multipartRequest.getParameter("title"));
 		pstmt.setString(5, multipartRequest.getParameter("content_text"));
@@ -249,7 +250,6 @@ if(posted.equals("yes")){
         out.println(e.getMessage());
     }
 	//location정보 가져오기
-	String nation="";
 	
 	String locationSql = "select nation from location natural join itr_contain where post_id="+ post_id;
 	stmt = conn.createStatement();
