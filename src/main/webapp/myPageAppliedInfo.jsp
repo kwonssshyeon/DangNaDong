@@ -20,13 +20,15 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
         var member_id = userId;
        
         if (acceptedApplications < maxParticipants) {
-            $('#acceptModal').modal('show');
+            //$('#acceptModal').modal('show');
             
             handleState("수락", member_id,acceptedApplications,Number_of_recruited,PostId);
+            alert("동행을 수락하셨습니다.");
+
             setTimeout(function () {
             	 window.location.reload();
             	
-            }, 1500);
+            });
         } else {
             // 정원 초과 모달 또는 다른 처리 추가
             alert("정원이 초과되었습니다.");
@@ -37,11 +39,13 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
 
     function rejectRequestState(userId, maxParticipants, acceptedApplications,Number_of_recruited,PostId) {
     	var member_id=userId;
-        $('#rejectModal').modal('show');
+        //$('#rejectModal').modal('show');
         handleState("거절", member_id, acceptedApplications, Number_of_recruited, PostId);
+        alert("동행을 거절하셨습니다.");
+        
         setTimeout(function () {
         	 window.location.reload();
-           },1500);
+           });
         window.location.reload();
     }
 
