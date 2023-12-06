@@ -51,6 +51,7 @@ String my_id = (String)s.getAttribute("member_id");
 int post_id = Integer.parseInt(request.getParameter("post_id"));
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 boolean isOwner=false;
+String close = "진행";
 %>
 
 <script type="text/javascript">	
@@ -150,6 +151,7 @@ $(document).ready(function() {
 	} catch (SQLException e) {
         out.println(e.getMessage());
     }
+	close = state;
 	//location정보 가져오기
 	String nation="";
 	
@@ -275,7 +277,7 @@ $(document).ready(function() {
 	            <div class="card mb-4">
 	            <div class="d-grid gap-2">
 	            <!-- 본인 글에는 신청/채팅할 수 없도록 -->
-	            <% if (isOwner==false){
+	            <% if (isOwner==false && !close.equals("마감")){
 	            	out.print("<input type='button' class='btn btn-primary' value='채팅하기' onClick='chatting()' />");
 	            }
 	            else{
@@ -287,7 +289,7 @@ $(document).ready(function() {
 	            </div>
 	            <div class="card mb-4">
 	            	<div class="d-grid gap-2">
-	            	<% if (isOwner==false){
+	            	<% if (isOwner==false && !close.equals("마감")){
 		            	out.print("<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#exampleModal'>신청하기</button>");
 		            }
 		            else{
