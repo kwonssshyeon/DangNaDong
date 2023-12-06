@@ -13,7 +13,13 @@
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
+<%
+String PostId = request.getParameter("post_id");	 
+HttpSession s = request.getSession();
+String my_id = (String)s.getAttribute("member_id");
+String nation_code=request.getParameter("nation");
+String nation="";
+%>
 <script>
    $(function(){
 	    $("#navbar").load("layout/navbar.html");
@@ -39,19 +45,50 @@
 	      }
 	      return unescape(cValue);
 	}
+
+	function UpdateintroPost() {
+		console.log("UpdateCompanionPost function called");
+	    var title = document.getElementsByName("title")[0].value;
+	    var travelDate = document.getElementById("currentDate").value;
+	    var travelPeriod = document.getElementsByName("travel_period")[0].value;
+	   	var expectedCost = document.getElementsByName("cost")[0].value;
+	    var contentText = document.getElementsByName("content_text")[0].value;
+	    var imageName = document.getElementsByName('image')[0].files[0].name;
+
+
+
+	   console.log(title);
+	    // Ajax 요청을 보냄
+	    $.ajax({
+	        type: "POST",
+	        url:"<%=request.getContextPath()%>" + "/UpdateIntroPostServlet",
+	        data: {
+	            title: title,
+	            travelDate: travelDate,
+	            travelPeriod: travelPeriod,
+	            expectedCost: expectedCost, // 추가한 부분
+	            contentText: contentText, // 추가한 부분
+	            imageName: imageName,
+	            memberId: '<%= my_id %>', // 세션에서 가져온 멤버 ID
+	            postId: '<%= PostId %>' // 게시물 ID
+	        },
+	        success: function(response) {
+	            // 서버에서의 응답에 따른 동작
+	            console.log(response);
+	        },
+	        error: function(error) {
+	            // 에러 핸들링
+	            console.error(error);
+	        }
+	    });
+	}
 </script>
 <script>
 setCookie("posted", "yes", 1);
 </script>
 </head>
 <body>
-<%
-int post_id;
-HttpSession s = request.getSession();
-String my_id = (String)s.getAttribute("member_id");
-String nation_code=request.getParameter("nation");
-String nation="";
-%>
+
 <%
 	String serverIP = "localhost";
 	String strSID = "orcl";
@@ -73,7 +110,7 @@ String nation="";
 	Class.forName("oracle.jdbc.driver.OracleDriver");
 	conn = DriverManager.getConnection(url,user,pass);
 	
-	String PostId = request.getParameter("post_id");	     
+	     
 	String query = "SELECT Title, Travel_date,Travel_period,Cost,Content_text FROM TRAVEL_INTRODUCTION_POST WHERE Post_id=?";
 	     
 	pstmt = conn.prepareStatement(query);
@@ -149,7 +186,7 @@ String nation="";
 		<br/>
 		<br/>
 		<button type="reset" class="btn btn-primary">Reset</button>
-		<button type="submit" class="btn btn-primary">Submit</button>
+		<a href="./detailIntroducePost.jsp?post_id=<%= PostId %>" class="btn btn-primary" role="button" onclick="UpdateintroPost()">Submit</a>
 
 		
 	</form>
