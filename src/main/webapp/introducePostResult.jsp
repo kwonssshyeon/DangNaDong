@@ -112,17 +112,20 @@ if (cookies != null) {
 }
 %>
 <%
+
+String max_query="SELECT MAX(Post_id) FROM TRAVEL_INTRODUCTION_POST";
+Statement stmt = conn.createStatement();
+ResultSet max_rs = stmt.executeQuery(max_query);
+if(max_rs.next())
+	post_id = max_rs.getInt(1);
+max_rs.close();
+stmt.close();
+
 if(posted.equals("yes")){
 	Lock lock = new ReentrantLock();
 	lock.lock();
 
-	String max_query="SELECT MAX(Post_id) FROM TRAVEL_INTRODUCTION_POST";
-	Statement stmt = conn.createStatement();
-	ResultSet max_rs = stmt.executeQuery(max_query);
-	if(max_rs.next())
-		post_id = max_rs.getInt(1);
-	max_rs.close();
-	stmt.close();
+	
 %>
 
 <%
@@ -232,7 +235,7 @@ if(posted.equals("yes")){
 	String cost="";
 		
 	String selectSql = "select * from TRAVEL_INTRODUCTION_POST where post_id="+ post_id;
-	Statement stmt = conn.createStatement();
+	stmt = conn.createStatement();
 	try{
 		rs = stmt.executeQuery(selectSql);
 		while (rs.next()) {

@@ -82,10 +82,10 @@ String nation="";
 	rs = pstmt.executeQuery(); 
 
 	 while (rs.next()) {
-         title = rs.getString("Title");
+         title = rs.getString(1);
 
          // Travel_date를 java.sql.Date로 받아오기
-         java.sql.Date travelDateSql = rs.getDate("Travel_date");
+         java.sql.Date travelDateSql = rs.getDate(2);
 
          // java.sql.Date를 java.util.Date로 변환 (생략 가능)
          Date travelDateUtil = new Date(travelDateSql.getTime());
@@ -94,10 +94,10 @@ String nation="";
          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
          travelDateStr = dateFormat.format(travelDateUtil);
 
-         travelPeriod = rs.getString("Travel_period");
+         travelPeriod = rs.getString(3);
          
-         Cost = rs.getString("Cost");
-         contentText = rs.getString("Content_text");
+         Cost = rs.getString(4);
+         contentText = rs.getString(5);
      };
 
 	rs.close();

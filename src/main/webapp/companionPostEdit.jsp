@@ -102,8 +102,8 @@ String nation="";
              numberOfRecruited = rs.getInt(6);
              genderCondition = rs.getString(7);
              ageCondition = rs.getString(8);
-             nationalityCondition = rs.getString(9);
-             contentText = rs.getString(10);
+             nationalityCondition = rs.getString(10);
+             contentText = rs.getString(9);
 	     };
 	
 

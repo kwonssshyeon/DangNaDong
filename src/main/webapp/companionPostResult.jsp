@@ -64,16 +64,19 @@ if (cookies != null) {
 }
 %>
 <%
+
+String max_query="SELECT MAX(Post_id) FROM TRAVEL_COMPANION_POST";
+Statement stmt = conn.createStatement();
+ResultSet max_rs = stmt.executeQuery(max_query);
+if(max_rs.next())
+	post_id = max_rs.getInt(1);
+max_rs.close();
+stmt.close();
+
 if(posted.equals("yes")){
 	Lock lock = new ReentrantLock();
 	lock.lock();
-	String max_query="SELECT MAX(Post_id) FROM TRAVEL_COMPANION_POST";
-	Statement stmt = conn.createStatement();
-	ResultSet max_rs = stmt.executeQuery(max_query);
-	if(max_rs.next())
-		post_id = max_rs.getInt(1);
-	max_rs.close();
-	stmt.close();
+	
 %>
 <%
 	conn.setAutoCommit(false);
@@ -225,7 +228,7 @@ $(document).ready(function() {
 	
 	//동행글 정보 가져오기
 	String selectSql = "select * from TRAVEL_COMPANION_POST where post_id="+ post_id;
-	Statement stmt = conn.createStatement();
+	stmt = conn.createStatement();
 	try{
 		rs = stmt.executeQuery(selectSql);
 		while (rs.next()) {
