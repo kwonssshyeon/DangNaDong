@@ -22,7 +22,7 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
           // 서버로 해당 게시글의 Post_id를 전송하여 삭제 요청
           $.ajax({
               type: "POST",
-              url: "<%=request.getContextPath()%>" + "/deletepost",
+              url: "<%=request.getContextPath()%>" + "/DeleteCompanionPostServlet",
               data: {post_id: postId},
               success: function (response) {
                   // 성공적으로 삭제되었을 때의 동작
