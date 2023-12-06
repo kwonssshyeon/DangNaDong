@@ -39,7 +39,7 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
 	        type: "POST",
 	        url: "<%=request.getContextPath()%>" + "/UpdateMemberServlet",
 	        data: {
-	            member_id: "Mid1",
+	            member_id:currentMemberId ,
 	            nickname: nickname,
 	            introduction: introduction,
 	            email: email,
@@ -124,7 +124,7 @@ pageEncoding="UTF-8"%> <%@ page import="java.sql.*" %>
                 %>
                 
 		<script>
-
+		var currentMemberId = '<%= currentMemberId %>'
     function updateProfileImage() {
         var profileImagePath = '<%= profileImagePath %>';
         console.log("profileImagePath test: " + profileImagePath);
