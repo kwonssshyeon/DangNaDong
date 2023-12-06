@@ -19,14 +19,64 @@
 	});
 </script>
 </head>
-<body>
 <%
-int post_id;
+String PostId = request.getParameter("post_id");	 
 HttpSession s = request.getSession();
 String my_id = (String)s.getAttribute("member_id");
 String nation_code=request.getParameter("nation");
 String nation="";
 %>
+<script>
+function UpdateCompanionPost() {
+	console.log("UpdateCompanionPost function called");
+	console.log("UpdateCompanionPost function called");
+    var title = document.getElementsByName("title")[0].value;
+    var travelDate = document.getElementById("currentDate").value;
+    var travelPeriod = document.getElementsByName("travel_period")[0].value;
+    var deadline = document.getElementsByName("deadline")[0].value;
+    var expectedCost = document.getElementsByName("expected_cost")[0].value;
+    var numberOfRecruited = document.getElementsByName("number_of_recruited")[0].value;
+    var genderCondition = document.getElementsByName("gender_condition")[0].value;
+    var ageCondition = document.getElementsByName("age_condition")[0].value;
+    var nationalityCondition = document.getElementsByName("nationality_condition")[0].value;
+    var contentText = document.getElementsByName("content_text")[0].value;
+    var imageName = document.getElementsByName('image')[0].value;
+
+
+   console.log(title);
+    // Ajax 요청을 보냄
+    $.ajax({
+        type: "POST",
+        url:"<%=request.getContextPath()%>" + "/UpdateCompanionPostServlet",
+        data: {
+            title: title,
+            travelDate: travelDate,
+            travelPeriod: travelPeriod,
+            deadline: deadline, // 추가한 부분
+            expectedCost: expectedCost, // 추가한 부분
+            numberOfRecruited: numberOfRecruited, // 추가한 부분
+            genderCondition: genderCondition, // 추가한 부분
+            ageCondition: ageCondition, // 추가한 부분
+            nationalityCondition: nationalityCondition, // 추가한 부분
+            contentText: contentText, // 추가한 부분
+            imageName: imageName,
+            memberId: '<%= my_id %>', // 세션에서 가져온 멤버 ID
+            postId: '<%= PostId %>' // 게시물 ID
+        },
+        success: function(response) {
+            // 서버에서의 응답에 따른 동작
+            console.log(response);
+        },
+        error: function(error) {
+            // 에러 핸들링
+            console.error(error);
+        }
+    });
+}
+</script>
+<body>
+
+
 <%
 	String serverIP = "localhost";
 	String strSID = "orcl";
@@ -70,7 +120,7 @@ String nation="";
 		 Class.forName("oracle.jdbc.driver.OracleDriver"); 
 	     conn = DriverManager.getConnection(url, user, pass); 
 	     
-	     String PostId = request.getParameter("post_id");	     
+	         
 	     String query = "SELECT Title, Travel_date,Travel_period,Deadline,Expected_cost,Number_of_recruited,Gender_condition,Age_condition,Content_text,Nationality_condition FROM TRAVEL_COMPANION_POST WHERE Post_id=?";
 	     
 	     pstmt = conn.prepareStatement(query);
@@ -150,6 +200,8 @@ String nation="";
 		<div class="mb-3">
 		  <label for="formGroupExampleInput2" class="form-label">사진 첨부</label>
 		  <input input type="file" name="image" class="form-control" id="formGroupExampleInput2" required>
+		  
+		  
 		</div>
 		<div class="mb-3">
 			<label for="formGroupExampleInput" class="form-label">글쓰기</label>
@@ -159,15 +211,10 @@ String nation="";
 		</div>
 		
 		<br/>
-		
-
-		
-		
-	
 		<br/>
 		<br/>
-		<button type="reset" class="btn btn-primary">Reset</button>
-		<button type="submit" class="btn btn-primary">Submit</button>
+			<button type="reset" class="btn btn-primary">Reset</button>
+			<a href="./detailCompanionPost.jsp?post_id=<%= PostId %>" class="btn btn-primary" role="button" onclick="UpdateCompanionPost()">Submit</a>
 	</form>
 
 
