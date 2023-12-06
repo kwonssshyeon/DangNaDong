@@ -44,11 +44,12 @@
 	}
 	conn = DriverManager.getConnection(url,user,pass);
 %>
-<%!
-int post_id;
-String member_id="Mid1";
+<%
+int post_id=0;
+HttpSession s = request.getSession();
+String my_id = (String)s.getAttribute("member_id");
+String nation_code = (String)s.getAttribute("nation");
 String creationTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-String nation_code="KOR";
 boolean isOwner=false;
 %>
 <%
@@ -76,12 +77,8 @@ if(posted.equals("yes")){
 %>
 <%
 	conn.setAutoCommit(false);
-	Savepoint savePoint = null;
-	try {
-		savePoint = conn.setSavepoint("savePoint");
-	} catch (SQLException e) {
-		e.printStackTrace();
-	}
+	Savepoint savePoint = conn.setSavepoint("savePoint");
+	
 	
 	String directory = "C:/SourceCode/2023_Database/DangNaDong/src/main/webapp/image/";
 	int maxSize = 1024*1024*100;
@@ -99,7 +96,7 @@ if(posted.equals("yes")){
 		post_id=post_id+1;
 		
 		pstmt.setInt(1, post_id);
-		pstmt.setString(2, "Mid1");
+		pstmt.setString(2, my_id);
 		pstmt.setString(3, creationTime);
 		pstmt.setString(4, multipartRequest.getParameter("title"));
 		pstmt.setString(5, multipartRequest.getParameter("content_text"));
@@ -187,7 +184,7 @@ if(posted.equals("yes")){
 <script>
 
 $(document).ready(function() {
-    var member_id = '<%= member_id %>';
+    var member_id = '<%= my_id %>';
     var post_id = <%= post_id %>;
     
     $("#likeButton").on("click", function() {

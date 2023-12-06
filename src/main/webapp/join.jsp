@@ -15,7 +15,7 @@
 <body>
 <%
 //변경된 경로
-	String directory = "C:/2023_Database/DangNaDong/src/main/webapp/image/";
+	String directory = "C:/SourceCode/2023_Database/DangNaDong/src/main/webapp/image/";
 	int maxSize = 1024*1024*100;
 	String encoding = "UTF-8";
 
@@ -30,6 +30,7 @@
 	String gender = multipartRequest.getParameter("gender");
 	String nickname = multipartRequest.getParameter("nickname");
 	String image_url = multipartRequest.getOriginalFileName("profile_image");
+	image_url = "./image/"+image_url;
 	//String image_name = multipartRequest.getFilesystemName("profile_image");
 	
 	String serverIP = "localhost";
