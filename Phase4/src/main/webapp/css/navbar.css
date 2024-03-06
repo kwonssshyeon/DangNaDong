@@ -1,0 +1,32 @@
+@charset "UTF-8";
+* {
+  margin: 0;
+  border: 0;
+  box-sizing: border-box;
+}
+.nav {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  background: #FFC300;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.nav li a{
+  text-decoration: none;
+}
+
+.nav li a:link {
+  color: white;
+}
+
+.nav li a:visited {
+  color: white;
+}
+
+.nav li a:hover {
+  color: black;
+}

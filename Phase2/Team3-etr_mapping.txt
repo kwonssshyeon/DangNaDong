@@ -1,0 +1,70 @@
+-------ERD 수정--------
+<Entity 관련>
+1. LOCATION 엔티티의 key attribute를 추가하였습니다.
+2. APPLICATION_INFO의 Apply_id(partial key)는 parent Entity들의 PK로 식별가능하기 때문에 삭제하였습니다.
+3. TRAVEL_COMPANION_POST, TRAVEL_INTRODUCTION_POST 엔티티의 Description은 글과 사진이 혼합된 정보로 이를 composite attribute를 이용해 나타내었고, Image는 여러개일수 있어 multivalued attribute로 나타내었습니다.
+4. TRAVEL_COMPANION_POST의 Companions, MEMBER의 Companion_post_list, Introduction_post_list는 다른 엔티티에 있는 정보로 연관관계로 참조할 수 있기 때문에 삭제하였습니다.
+5. LIKED_BY의 is_like, SCRAP의 is_scrap 속성을 삭제하였습니다.
+6. CHAT_ROOM 엔티티를 새롭게 추가하였습니다.
+7. CHAT_ROOM 엔티티와 MEMBER 엔티티 사이에 relationship CREATE를 추가했고, CHAT_ROOM 엔티티와 ONE_TO_ONE_CHAT 엔티티 사이에 relationship CONTAIN을 추가했습니다.
+8. COMMENT 엔티티의 이름을 REPLY로 수정했습니다.
+
+<Relationship 관련>
+1. Identifying relationship의 표현이 빠져있어 추가하였습니다.
+2. CREATE(CREATED_BY) 추가
+ - 관계 : 사용자 - 채팅방(1:N)
+ - 의미 : 사용자가 동행 포스트와 관련하여 채팅방을 생성할 수 있음을 의미합니다. 한명의 사용자는 N개의 채팅방을 생성할 수 있으므로 1:N 관계입니다.
+3. CONTAIN 추가
+ - 관계 : 채팅방 - 채팅 메세지(1:N)
+ - 의미 : 하나의 채팅방이 N개의 채팅 메세지를 가질 수 있음을 의미합니다.
+4. HAS 추가
+ - 관계 : 동행 게시글 - 채팅방(1:N)
+ - 의미 : 동행글에 대하여, 동행글 작성자와 동행 의사를 표시한 사용자가 채팅할 수 있는 채팅방이 있음을 의미합니다. 하나의 동행글에는 각각 다른 사용자와의 채팅방이 존재할 수 있으므로 1:N 관계입니다.
+
+------ETR MAPPING-------
+
+[1. Reqular Entity Types]
+:ER schema 의 strong entity 에 대해, entity의 모든 simple attribute를 포함하는 Relation 생성.
+- MEMBER (PK: Member_id)
+- TRAVEL_COMPANION_POST (PK: Post_id)
+- TRAVEL_INTRODUCTION_POST (PK: Post_id)
+- LOCATION (PK: Location_id)
+- CHAT_ROOM (PK: Chat_room_id)
+
+[2. Weak Entitiy Types]
+:ER schema 에서 owner entity가 있는 weak entity에 대해, weak entity의 모든 simple attribute를 포함하는 Relation 생성
+ Owner entity의 PK를 FK로 포함, PK : {owner entitiy의 PK(s)} + weak entity의 partial key
+- REPLY (PK: {Post_id} + Reply_id)
+- APPLICATION_INFO (PK: {Post_id} + {Member_id})
+- REAL_TIME_CHAT (PK: {Location_id} + Chat_id)
+- ONE_TO_ONE_CHAT (PK: {Chat_room_id} + {Member_id} + Chat_id)
+
+[3. Binary 1:N Relationship Types]
+: 1:N 관계에 있는 T,S relations에 대하여 N-side의 T가 S의 PK를 가져와 FK로 가짐
+ (1-side --[relationship]--> N-side)
+- LOCATION(PK:Location_id) --[HAS]--> REAL_TIME_CHAT(FK:Location_id)
+- TRAVLE_INTRODUCTION_POST(PK:Post_id) --[HAS]--> REPLY(FK:Post_id)
+- TRAVEL_COMPANION_POST(PK:Post_id) --[HAS]--> APPLICATION_INFO(FK:Post_id)
+- TRAVEL_COMPANION_POST(PK:Post_id) --[HAS]--> CHAT_ROOM (FK:Member_id)
+- CHAT_ROOM(PK:Chat_room_id) --[CONTAIN]--> ONE_TO_ONE_CHAT(FK:Chat_room_id)
+- MEMBER(PK:Member_id) --[WRITE]--> TRAVEL_COMPANION_POST(FK:Member_id)
+- MEMBER(PK:Member_id) --[WRITE]--> TRAVEL_INTRODUCTION_POST(FK:Member_id)
+- MEMBER(PK:Member_id) --[CREATED_BY]--> APPLICATION_INFO(FK:Member_id)
+- MEMBER(PK:Member_id) --[WRITE]--> REPLY(FK:Member_id)
+- MEMBER(PK:Member_id) --[SEND]--> REAL_TIME_CHAT(FK:Member_id)
+- MEMBER(PK:Member_id) --[SEND]--> ONE_TO_ONE_CHAT(FK:Member_id)
+- MEMBER(PK:Member_id) --[CREATE]--> CHAT_ROOM (FK:Member_id)
+
+[4. Binary M:N Relationship Types]
+:새로운 relation 생성, 이 relation은 관계를 중심으로 양 쪽 relation의 PK를 참조한 FK를 가짐
+ 두 개의 FK를 조합하여 PK로 지정
+- TRAVEL_COMPANION_POST(PK:Post_id) - LIKE_POST(PK:(FK:Post_id + FK:Member_id)) - MEMBER(PK:Member_id)
+- TRAVEL_COMPANION_POST(PK:Post_id) - CPN_CONTAIN(PK:(FK:Post_id + FK:Location_id)) - LOCATION(PK:Location_id)
+- TRAVEL_INTRODUCTION_POST(PK:Post_id) - SCRAP(PK:(FK:Post_id + FK:Member_id)) - MEMBER(PK:Member_id)
+- TRAVEL_INTRODUCTION_POST(PK:Post_id) - ITR_CONTAIN(PK:(FK:Post_id + FK:Location_id)) - LOCATION(PK:Location_id)
+
+[5. Multivalued Attributes]
+:Multivalued attribute에 대하여 새로운 relation 생성, 해당 multivalued attribute를 가지는 owner entity의 PK를 FK로 참조
+ 해당 attribute와 owner entity 참조한 FK를 조합하여 PK로 지정
+- CPN_IMAGE (PK: Post_id + Img_name)
+- ITR_IMAGE (PK: Post_id + Img_name)
